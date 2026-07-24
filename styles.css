@@ -219,14 +219,41 @@ main {
    ========================================================================== */
 
 .intro {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  /* flow-root, not flex, so the portrait can float beside the text on wide
+     screens. Vertical rhythm between the text blocks is set with explicit
+     margins below. */
+  display: flow-root;
+}
+
+/* Portrait. The <img> carries width/height attributes and an aspect-ratio
+   here, so its box is reserved before the file loads — zero layout shift.
+   Stacked on top on mobile; floats to a right rail from 40rem up. */
+.portrait {
+  margin: 0 0 1.5rem;
+  max-inline-size: 11rem;
+}
+
+.portrait img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 3 / 4;
+  border-radius: 6px;
+  border: var(--rule) solid var(--line-strong);
+}
+
+.portrait figcaption {
+  margin-block-start: 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--mute);
 }
 
 .lede {
   font-size: 1.0625em;
   color: var(--mute);
+  margin-block-start: 1.25rem;
   /* Four lines at the narrowest layout — prose edits never move the dl. */
   min-height: 7.5rem;
 }
@@ -239,8 +266,18 @@ main {
   align-items: baseline;
   font-family: var(--mono);
   font-size: 0.8125rem;
+  margin-block-start: 1.5rem;
   padding-block-start: 1.25rem;
   border-block-start: var(--rule) solid var(--line);
+}
+
+@media (min-width: 40rem) {
+  .portrait {
+    float: inline-end;
+    inline-size: 14rem;
+    max-inline-size: 40%;
+    margin-inline-start: 2rem;
+  }
 }
 
 .facts dt {
