@@ -344,6 +344,10 @@ main {
 .spec dd {
   color: var(--ink);
   min-height: 1.45em;
+  /* Long unbroken tokens (URLs, emails, issuer names) wrap inside the 1fr
+     column instead of forcing horizontal overflow at 320px. */
+  overflow-wrap: break-word;
+  min-inline-size: 0;
 }
 
 .outcomes {
