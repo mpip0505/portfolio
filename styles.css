@@ -1,0 +1,162 @@
+/* ==========================================================================
+   Muhaimin Afif — portfolio
+   Palette: five hex values. Everything else is derived with color-mix().
+   ========================================================================== */
+
+:root {
+  /* -- palette ------------------------------------------------------------ */
+  --bg:     #e8edf1;  /* page — cool grey, deliberately not cream           */
+  --paper:  #ffffff;  /* raised surfaces                                    */
+  --ink:    #0f1c26;  /* body text                                          */
+  --mute:   #4d6376;  /* secondary text, metadata keys                      */
+  --accent: #0a5a86;  /* links, focus, emphasis rules                       */
+
+  /* -- derived ------------------------------------------------------------ */
+  --line:  color-mix(in srgb, var(--mute) 26%, transparent);
+  --line-strong: color-mix(in srgb, var(--mute) 45%, transparent);
+  --field: color-mix(in srgb, var(--accent) 6%, var(--paper));
+
+  /* -- type --------------------------------------------------------------- */
+  --ui:   ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+          "Liberation Mono", monospace;
+
+  /* -- rhythm ------------------------------------------------------------- */
+  --gap:  1.5rem;
+  --rule: 1px;
+  --measure: 62ch;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:     #0d1418;
+    --paper:  #131c22;
+    --ink:    #e6edf2;
+    --mute:   #9fb2c0;
+    --accent: #6fb4de;
+    --field:  color-mix(in srgb, var(--accent) 9%, var(--paper));
+  }
+}
+
+/* ==========================================================================
+   Reset — narrow on purpose
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body, h1, h2, h3, h4, p, ul, li, dl, dt, dd, figure, address {
+  margin: 0;
+  padding: 0;
+}
+
+ul { list-style: none; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* Anchor targets clear the sticky masthead without JS. */
+  scroll-padding-block-start: 5rem;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  line-height: 1.6;
+  text-underline-offset: 0.18em;
+  /* Reserve the full viewport so a short page never reflows the footer. */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+h1, h2, h3, h4 {
+  line-height: 1.2;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+h1 { font-size: clamp(1.75rem, 1.35rem + 2vw, 2.75rem); }
+h2 { font-size: clamp(1.05rem, 1rem + 0.3vw, 1.2rem); }
+h3 { font-size: clamp(1.15rem, 1.05rem + 0.6vw, 1.5rem); }
+h4 { font-size: 0.95rem; }
+
+p { text-wrap: pretty; max-width: var(--measure); }
+
+strong { font-weight: 650; }
+
+abbr[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+}
+
+a:hover { text-decoration-thickness: 2px; }
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+
+.skip {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  z-index: 10;
+  padding: 0.6rem 1rem;
+  background: var(--accent);
+  color: var(--paper);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 2px;
+  /* Hidden by translation, not display — no layout involvement either way. */
+  transform: translateY(-200%);
+}
+
+.skip:focus-visible { transform: translateY(0); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   Shell
+   ========================================================================== */
+
+.masthead,
+main,
+.colophon {
+  width: 100%;
+  max-width: 60rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 7vw, 5rem);
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+}
