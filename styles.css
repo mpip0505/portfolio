@@ -463,20 +463,21 @@ main {
 }
 
 /* Two-column split for lead projects once there is room.
-   Grid with the spec on a right rail spanning every row via `1 / -1` — that
-   is line-relative, not a row count, so adding spec rows or outcomes needs
-   no CSS change. Every other child auto-flows down the left column. */
+   A float, not a grid: the spec floats to a right rail and the prose,
+   outcomes and links flow beside and then under it. This needs no row
+   count and no wrapper — adding spec rows, outcomes or a whole project
+   changes nothing here. flow-root contains the float within the card. */
 @media (min-width: 46rem) {
   .project[data-emphasis="lead"] {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 16rem;
-    column-gap: 2rem;
-    align-items: start;
+    display: flow-root;
   }
-  .project[data-emphasis="lead"] > :not(.spec) { grid-column: 1; }
+  .project[data-emphasis="lead"] > * { margin-block-start: 1rem; }
+  .project[data-emphasis="lead"] > :first-child { margin-block-start: 0; }
+
   .project[data-emphasis="lead"] .spec {
-    grid-column: 2;
-    grid-row: 1 / -1;
-    align-self: stretch;
+    float: inline-end;
+    inline-size: 16rem;
+    margin-inline-start: 2rem;
+    margin-block-start: 0;
   }
 }
