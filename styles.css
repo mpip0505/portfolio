@@ -275,3 +275,144 @@ main {
 }
 
 .colophon-note { max-width: 34ch; }
+
+/* ==========================================================================
+   Section titles
+   ========================================================================== */
+
+.section-title {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--mute);
+  padding-block-end: 0.75rem;
+  margin-block-end: 2rem;
+  border-block-end: var(--rule) solid var(--line);
+}
+
+/* ==========================================================================
+   Work — one repeatable article pattern.
+   No :nth-child, no counters, no per-project selectors: adding another
+   <article> needs zero CSS changes. Weight is switched by data-emphasis only.
+   ========================================================================== */
+
+.work {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.project {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  background: var(--paper);
+  border: var(--rule) solid var(--line);
+  border-inline-start: 3px solid var(--line-strong);
+  border-radius: 4px;
+}
+
+.project h3 { min-height: 1.2em; }
+
+/* The signature: monospace key/value metadata. */
+.spec {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 1rem;
+  row-gap: 0.35rem;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 0.78125rem;
+  line-height: 1.45;
+  padding: 0.85rem 1rem;
+  background: var(--field);
+  border: var(--rule) solid var(--line);
+  border-radius: 3px;
+}
+
+.spec dt {
+  color: var(--mute);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+
+.spec dd {
+  color: var(--ink);
+  min-height: 1.45em;
+}
+
+.outcomes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: var(--measure);
+}
+
+.outcomes li {
+  position: relative;
+  padding-inline-start: 1.25rem;
+  color: var(--mute);
+  font-size: 0.9375rem;
+}
+
+.outcomes li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0.1rem;
+  inset-block-start: 0.6em;
+  inline-size: 0.5rem;
+  block-size: 1px;
+  background: var(--accent);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+}
+
+.links a {
+  text-decoration: none;
+  padding-block-end: 1px;
+  border-block-end: 1px solid var(--line-strong);
+}
+
+.links a:hover,
+.links a:focus-visible { border-block-end-color: var(--accent); }
+
+/* -- lead emphasis ------------------------------------------------------- */
+/* Heavier treatment, driven only by the attribute. */
+.project[data-emphasis="lead"] {
+  border-inline-start-color: var(--accent);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.project[data-emphasis="lead"] h3 {
+  font-size: clamp(1.35rem, 1.1rem + 1vw, 1.75rem);
+}
+
+/* Two-column split for lead projects once there is room.
+   Grid with the spec on a right rail spanning every row via `1 / -1` — that
+   is line-relative, not a row count, so adding spec rows or outcomes needs
+   no CSS change. Every other child auto-flows down the left column. */
+@media (min-width: 46rem) {
+  .project[data-emphasis="lead"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 16rem;
+    column-gap: 2rem;
+    align-items: start;
+  }
+  .project[data-emphasis="lead"] > :not(.spec) { grid-column: 1; }
+  .project[data-emphasis="lead"] .spec {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: stretch;
+  }
+}
