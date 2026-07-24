@@ -42,6 +42,108 @@
     </dl>
   </section>
 
+  <section id="work" class="work" aria-label="Selected work">
+    <h2 class="section-title">Work</h2>
+
+    <article class="project" data-emphasis="lead" aria-label="Ship Cable Orders and Delivery Tracking System">
+      <h3>Ship Cable Orders &amp; Delivery Tracking System</h3>
+      <dl class="spec">
+        <dt>Stack</dt>
+        <dd>Supabase &middot; Postgres &middot; React &middot; Vercel</dd>
+        <dt>Role</dt>
+        <dd>Sole designer and developer</dd>
+        <dt>Status</dt>
+        <dd>In production, phased build ongoing</dd>
+      </dl>
+      <p>An internal system for a supplier of cables to ships, replacing scattered
+        Excel files with one source of truth. The data model runs Project &rarr;
+        Vessel &rarr; Cable, tracking every cable by length in metres across contract,
+        ordered and delivered figures, with a separate cutting-request workflow that
+        rolls up into cut and remaining totals.</p>
+      <ul class="outcomes">
+        <li>Retired the spreadsheet handover: roll-up totals compute per vessel and
+          per project instead of being re-keyed.</li>
+        <li>Excel export with a column picker, so the office keeps the reporting
+          format it already uses.</li>
+        <li>Search, filter and sort across cable tables that had previously been
+          scanned by eye.</li>
+      </ul>
+      <ul class="links" aria-label="Links for Ship Cable Orders and Delivery Tracking System">
+        <li><a href="https://github.com/mpip0505">Repository</a></li>
+        <li><a href="https://github.com/mpip0505">Live site</a></li>
+      </ul>
+    </article>
+
+    <article class="project" data-emphasis="lead" aria-label="Golf Prediction Platform">
+      <h3>Golf Prediction Platform</h3>
+      <dl class="spec">
+        <dt>Stack</dt>
+        <dd>Python &middot; scikit-learn &middot; <abbr title="Amazon Web Services">AWS</abbr> &middot; GitHub Actions</dd>
+        <dt>Role</dt>
+        <dd>Sole developer</dd>
+        <dt>Status</dt>
+        <dd>v1 deployed, <abbr title="Machine Learning Operations">MLOps</abbr> pipeline in progress</dd>
+      </dl>
+      <p>A self-updating scoring prediction system for the PGA Tour. It started as an
+        end-to-end machine learning project deployed on GitHub Pages and AWS, and is
+        being extended into an automated retraining and deployment pipeline.</p>
+      <ul class="outcomes">
+        <li>Shipped the full path from raw tournament data to a public, live
+          prediction surface.</li>
+        <li>Scheduled data refresh and <abbr title="Continuous Integration and Continuous Deployment">CI/CD</abbr>
+          retraining, so the model does not go stale between seasons.</li>
+        <li>Model versioning, so a bad retrain can be identified and rolled back.</li>
+      </ul>
+      <ul class="links" aria-label="Links for Golf Prediction Platform">
+        <li><a href="https://github.com/mpip0505">Repository</a></li>
+        <li><a href="https://github.com/mpip0505">Live site</a></li>
+      </ul>
+    </article>
+
+    <article class="project" aria-label="Project Guardian">
+      <h3>Project Guardian</h3>
+      <dl class="spec">
+        <dt>Stack</dt>
+        <dd>Python &middot; YOLO &middot; PyTorch</dd>
+        <dt>Role</dt>
+        <dd>Data pipeline and model training</dd>
+        <dt>Status</dt>
+        <dd><abbr title="Sunway Engineering and Data Innovation Challenge 2026">SEDIC 2026</abbr></dd>
+      </dl>
+      <p>Maritime vessel detection using YOLO computer vision. I own the data
+        pipeline and the model training loop.</p>
+      <ul class="outcomes">
+        <li>Built the labelling and preprocessing pipeline feeding the detector.</li>
+        <li>Ran and evaluated the training cycle against maritime imagery.</li>
+      </ul>
+      <ul class="links" aria-label="Links for Project Guardian">
+        <li><a href="https://github.com/mpip0505">Repository</a></li>
+      </ul>
+    </article>
+
+    <article class="project" aria-label="Climate Risk Actuarial Model">
+      <h3>Climate Risk Actuarial Model</h3>
+      <dl class="spec">
+        <dt>Stack</dt>
+        <dd>Python &middot; statsmodels &middot; Monte Carlo simulation</dd>
+        <dt>Role</dt>
+        <dd>Team project, modelling</dd>
+        <dt>Status</dt>
+        <dd><abbr title="Malaysian Actuarial Students' Association">MASA</abbr> Hackathon 2026, for Hannover Re</dd>
+      </dl>
+      <p>A climate risk model pairing time-aware ARIMAX forecasting with a stochastic
+        catastrophe engine.</p>
+      <ul class="outcomes">
+        <li>Time-aware ARIMAX forecasting over historical climate series.</li>
+        <li>Stochastic catastrophe engine for tail-event loss simulation.</li>
+      </ul>
+      <ul class="links" aria-label="Links for Climate Risk Actuarial Model">
+        <li><a href="https://github.com/mpip0505">Repository</a></li>
+      </ul>
+    </article>
+
+  </section>
+
 </main>
 
 <footer class="colophon">
