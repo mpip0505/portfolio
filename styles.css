@@ -160,3 +160,118 @@ main {
   gap: clamp(3rem, 7vw, 5rem);
   padding-block: clamp(2.5rem, 6vw, 4.5rem);
 }
+
+/* ==========================================================================
+   Masthead
+   ========================================================================== */
+
+.masthead {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.75rem;
+  row-gap: 0.25rem;
+  padding-block: 0.9rem;
+  /* Sticky bar sits on the page colour, so it needs to be opaque. */
+  background: var(--bg);
+  border-block-end: var(--rule) solid var(--line);
+  /* Two lines on mobile, one on desktop — reserved either way. */
+  min-height: 4rem;
+}
+
+.masthead-name {
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.masthead-role {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--mute);
+}
+
+.masthead-nav { margin-inline-start: auto; }
+
+.navlist {
+  display: flex;
+  gap: clamp(0.75rem, 3vw, 1.5rem);
+  font-size: 0.875rem;
+}
+
+.navlist a {
+  color: var(--mute);
+  text-decoration: none;
+  padding-block: 0.25rem;
+  border-block-end: 2px solid transparent;
+}
+
+.navlist a:hover,
+.navlist a:focus-visible {
+  color: var(--ink);
+  border-block-end-color: var(--accent);
+}
+
+/* ==========================================================================
+   Intro
+   ========================================================================== */
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lede {
+  font-size: 1.0625em;
+  color: var(--mute);
+  /* Four lines at the narrowest layout — prose edits never move the dl. */
+  min-height: 7.5rem;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 1.25rem;
+  row-gap: 0.4rem;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  padding-block-start: 1.25rem;
+  border-block-start: var(--rule) solid var(--line);
+}
+
+.facts dt {
+  color: var(--mute);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.6875rem;
+}
+
+.facts dd {
+  color: var(--ink);
+  /* One line minimum, so a longer status string cannot collapse the row. */
+  min-height: 1.4em;
+}
+
+/* ==========================================================================
+   Colophon
+   ========================================================================== */
+
+.colophon {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem 1.5rem;
+  padding-block: 1.75rem;
+  border-block-start: var(--rule) solid var(--line);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--mute);
+  min-height: 5rem;
+}
+
+.colophon-note { max-width: 34ch; }
