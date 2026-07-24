@@ -428,6 +428,67 @@ main {
 }
 
 /* ==========================================================================
+   Certifications — reuses the .spec metadata treatment. The list is an
+   auto-fit grid, so a 4th or 5th <li> appended in the markup needs no CSS
+   change: no counts, no positional selectors.
+   ========================================================================== */
+
+.certlist {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.5rem;
+}
+
+.cert {
+  /* Each card reserves a badge gutter on the inline-start now. A future
+     <figure> is absolutely placed into it, so adding a badge shifts
+     nothing in either axis. --badge is the single source of that size. */
+  --badge: 3rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: calc(var(--badge) + 2 * clamp(1.1rem, 3vw, 1.5rem));
+  padding: clamp(1.1rem, 3vw, 1.5rem);
+  padding-inline-start: calc(clamp(1.1rem, 3vw, 1.5rem) + var(--badge) + 1rem);
+  background: var(--paper);
+  border: var(--rule) solid var(--line);
+  border-inline-start: 3px solid var(--line-strong);
+  border-radius: 4px;
+}
+
+.cert h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 1.2em;
+}
+
+/* Reserved badge slot. No <figure> exists yet; when one is added its box is
+   already sized and positioned, so the image causes zero layout shift. */
+.cert figure {
+  position: absolute;
+  inset-block-start: clamp(1.1rem, 3vw, 1.5rem);
+  inset-inline-start: clamp(1.1rem, 3vw, 1.5rem);
+  inline-size: var(--badge);
+  block-size: var(--badge);
+  aspect-ratio: 1 / 1;
+  margin: 0;
+}
+
+.cert figure img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+/* Status reuses the monospace utility face and reads as a piece of the
+   metadata, not a decorative pill. */
+.cert-status {
+  font-family: var(--mono);
+  font-size: 0.78125rem;
+}
+
+/* ==========================================================================
    Contact
    ========================================================================== */
 
