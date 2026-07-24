@@ -387,6 +387,70 @@ main {
 .links a:hover,
 .links a:focus-visible { border-block-end-color: var(--accent); }
 
+/* ==========================================================================
+   Stack
+   ========================================================================== */
+
+.stackgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1.5rem;
+}
+
+.stackgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-block-start: 0.85rem;
+  border-block-start: 2px solid var(--line-strong);
+}
+
+.stackgroup h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+.tags li {
+  padding: 0.3rem 0.55rem;
+  background: var(--field);
+  border: var(--rule) solid var(--line);
+  border-radius: 3px;
+  color: var(--mute);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Contact
+   ========================================================================== */
+
+.contact {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.contact-line { color: var(--mute); }
+
+.contact-list { font-style: normal; }
+
+.contact-list .spec { max-width: 34rem; }
+
+.contact-list .spec a {
+  text-decoration: none;
+  border-block-end: 1px solid var(--line-strong);
+}
+
+.contact-list .spec a:hover,
+.contact-list .spec a:focus-visible { border-block-end-color: var(--accent); }
+
 /* -- lead emphasis ------------------------------------------------------- */
 /* Heavier treatment, driven only by the attribute. */
 .project[data-emphasis="lead"] {
