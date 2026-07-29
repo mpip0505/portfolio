@@ -485,10 +485,21 @@ main {
    change: no counts, no positional selectors.
    ========================================================================== */
 
+/* Two-up at desktop: with four certs that fills both rows evenly instead of
+   leaving an orphan card, and the wider column keeps issuer names off a third
+   wrapped line. The <li> is the grid item, so it stretches to the row height —
+   the card inside flexes to fill it, making every box in a row identical. */
 .certlist {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  /* Equal rows, so a card whose issuer name wraps does not make its row taller
+     than the other — all four boxes end up the same size. */
+  grid-auto-rows: 1fr;
   gap: 1.5rem;
+}
+
+.certlist > li {
+  display: flex;
 }
 
 .cert {
@@ -498,6 +509,7 @@ main {
   --badge: 2rem;
   position: relative;
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 0.75rem;
   min-height: calc(var(--badge) + 2 * clamp(1.1rem, 3vw, 1.5rem));
@@ -536,6 +548,9 @@ main {
 /* Cert cards are narrow at three-up, so the spec runs tighter here to give
    the value column room — long issuer names wrap at spaces, not mid-word. */
 .cert .spec {
+  /* Fills the leftover card height so the inner panels line up bottom-to-bottom
+     across a row, not just the outer cards. */
+  flex: 1;
   padding: 0.7rem 0.8rem;
   column-gap: 0.6rem;
 }
