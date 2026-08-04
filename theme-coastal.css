@@ -44,6 +44,10 @@
   /* -- dark blocks -------------------------------------------------------- */
   --panel-pine:  var(--pine);
   --panel-slate: var(--slate);
+  /* The achievement display line. Cypress on cream reads as a citation and
+     measures ~9.5:1; the dark scheme has to swap it, since --pine there is
+     the ground the card sits on. */
+  --award-accent: var(--pine);
   --on-dark:     #EFE9DD;
   /* 84%, not less: the colophon sets this at 12px, where AA wants 4.5:1.
      At 74% it measured 4.29 on --slate. */
@@ -104,6 +108,7 @@
 
     --panel-pine:  #1A302A;
     --panel-slate: #21323B;
+    --award-accent: var(--sage);   /* ~5:1 on --paper */
     --on-dark:     #ECE5D8;
     --on-dark-mute: #B6C2BA;
   }
@@ -272,7 +277,8 @@ a:focus-visible { color: var(--link-hover); }
    ========================================================================== */
 
 .project,
-.cert {
+.cert,
+.award {
   transition: transform 200ms var(--ease), background-color 200ms ease,
               border-color 200ms ease, box-shadow 200ms ease;
 }
@@ -282,7 +288,9 @@ a:focus-visible { color: var(--link-hover); }
 .project:hover,
 .project:focus-within,
 .cert:hover,
-.cert:focus-within {
+.cert:focus-within,
+.award:hover,
+.award:focus-within {
   transform: translateY(-3px);
   background: color-mix(in srgb, var(--sand) 11%, var(--paper));
   border-color: var(--line-strong);
@@ -334,6 +342,31 @@ a:focus-visible { color: var(--link-hover); }
 /* Vercel's mark is masked with --ink so it can flip with the theme; on the
    pine panel that renders it near-invisible, so it follows the panel's text. */
 .stack .tags li[data-tech="vercel"]::before { background: var(--on-dark); }
+
+/* ==========================================================================
+   Achievements
+   The event is the heading but sets small, as a letterspaced eyebrow; the
+   result below it carries the display weight in the serif. Reads as a citation
+   line on a plaque, and keeps the heading order semantically intact.
+   ========================================================================== */
+
+.award { border-inline-start-color: var(--sage); }
+
+.award h3 {
+  font-family: var(--ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.award-result {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  line-height: 1.15;
+  color: var(--award-accent);
+}
 
 /* ==========================================================================
    Certifications

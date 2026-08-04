@@ -59,6 +59,13 @@ html {
   scroll-padding-block-start: 5rem;
 }
 
+/* Below ~34rem the masthead wraps the role onto its own line and the five nav
+   items onto two, standing taller than the 5rem above — without this a nav
+   jump lands with the heading hidden under the sticky bar. */
+@media (max-width: 34rem) {
+  html { scroll-padding-block-start: 8.5rem; }
+}
+
 body {
   background: var(--bg);
   color: var(--ink);
@@ -560,6 +567,52 @@ main {
 .cert-status {
   font-family: var(--mono);
   font-size: 0.78125rem;
+}
+
+/* ==========================================================================
+   Achievements — the same grid contract as .certlist: auto-fit columns, equal
+   rows, no counts and no positional selectors, so a fourth <li> appended in
+   the markup needs no CSS change. The <li> is the grid item and stretches to
+   the row height; the card inside flexes to fill it.
+   ========================================================================== */
+
+.awardlist {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 1.5rem;
+}
+
+.awardlist > li {
+  display: flex;
+}
+
+.award {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: clamp(1.1rem, 3vw, 1.5rem);
+  background: var(--paper);
+  border: var(--rule) solid var(--line);
+  border-inline-start: 3px solid var(--line-strong);
+  border-radius: 4px;
+}
+
+.award h3 { min-height: 1.2em; }
+
+/* The result is the payload of the card. Reserved at two lines, so a longer
+   citation cannot push the spec panel down relative to its neighbours. */
+.award-result {
+  min-height: 2.4em;
+}
+
+/* Fills the leftover card height so the spec panels line up bottom-to-bottom
+   across a row, exactly as they do on the certification cards. */
+.award .spec {
+  flex: 1;
+  padding: 0.7rem 0.8rem;
+  column-gap: 0.6rem;
 }
 
 /* ==========================================================================
