@@ -6,7 +6,15 @@
 <title>Muhaimin Afif — Software Engineering Student</title>
 <meta name="description" content="Software engineering student at Universiti Malaya. Builds production internal systems, self-updating ML pipelines, and applied computer vision.">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F4EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141C19" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&amp;family=Inter:wght@400;500;600&amp;display=swap">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="theme-coastal.css">
+<!-- Not deferred: it sets the motion flag on <html> before the first paint. -->
+<script src="motion.js"></script>
 </head>
 <body>
 
@@ -54,9 +62,9 @@
   </section>
 
   <section id="work" class="work" aria-label="Selected work">
-    <h2 class="section-title">Work</h2>
+    <h2 class="section-title" data-reveal>Work</h2>
 
-    <article class="project" data-emphasis="lead" aria-label="Ship Cable Orders and Delivery Tracking System">
+    <article class="project" data-reveal data-emphasis="lead" aria-label="Ship Cable Orders and Delivery Tracking System">
       <h3>Ship Cable Orders &amp; Delivery Tracking System</h3>
       <dl class="spec">
         <dt>Stack</dt>
@@ -85,7 +93,7 @@
       </ul>
     </article>
 
-    <article class="project" data-emphasis="lead" aria-label="Golf Prediction Platform">
+    <article class="project" data-reveal data-emphasis="lead" aria-label="Golf Prediction Platform">
       <h3>Golf Prediction Platform</h3>
       <dl class="spec">
         <dt>Stack</dt>
@@ -111,7 +119,7 @@
       </ul>
     </article>
 
-    <article class="project" aria-label="Project Guardian">
+    <article class="project" data-reveal aria-label="Project Guardian">
       <h3>Project Guardian</h3>
       <dl class="spec">
         <dt>Stack</dt>
@@ -132,7 +140,7 @@
       </ul>
     </article>
 
-    <article class="project" aria-label="Solare">
+    <article class="project" data-reveal aria-label="Solare">
       <h3>Solare</h3>
       <dl class="spec">
         <dt>Stack</dt>
@@ -154,7 +162,7 @@
       </ul>
     </article>
 
-    <article class="project" aria-label="Climate Risk Actuarial Model">
+    <article class="project" data-reveal aria-label="Climate Risk Actuarial Model">
       <h3>Climate Risk Actuarial Model</h3>
       <dl class="spec">
         <dt>Stack</dt>
@@ -179,10 +187,10 @@
   </section>
 
   <section id="stack" class="stack" aria-label="Technical stack">
-    <h2 class="section-title">Stack</h2>
+    <h2 class="section-title" data-reveal>Stack</h2>
     <aside class="stackgrid" aria-label="Tools grouped by area">
 
-      <article class="stackgroup" aria-label="Cloud and infrastructure">
+      <article class="stackgroup" data-reveal aria-label="Cloud and infrastructure">
         <h3>Cloud &amp; Infra</h3>
         <ul class="tags">
           <li data-tech="supabase">Supabase</li>
@@ -193,7 +201,7 @@
         </ul>
       </article>
 
-      <article class="stackgroup" aria-label="Data and machine learning">
+      <article class="stackgroup" data-reveal aria-label="Data and machine learning">
         <h3>Data &amp; ML</h3>
         <ul class="tags">
           <li data-tech="scikit">scikit-learn</li>
@@ -205,7 +213,7 @@
         </ul>
       </article>
 
-      <article class="stackgroup" aria-label="Languages">
+      <article class="stackgroup" data-reveal aria-label="Languages">
         <h3>Languages</h3>
         <ul class="tags">
           <li data-tech="python">Python</li>
@@ -216,7 +224,7 @@
         </ul>
       </article>
 
-      <article class="stackgroup" aria-label="Tooling">
+      <article class="stackgroup" data-reveal aria-label="Tooling">
         <h3>Tooling</h3>
         <ul class="tags">
           <li data-tech="react">React</li>
@@ -230,11 +238,11 @@
   </section>
 
   <section id="certifications" class="certs" aria-label="Certifications">
-    <h2 class="section-title">Certifications</h2>
+    <h2 class="section-title" data-reveal>Certifications</h2>
     <ul class="certlist">
 
       <li>
-        <article class="cert" data-cert="cisco" aria-label="Introduction to Networks">
+        <article class="cert" data-reveal data-cert="cisco" aria-label="Introduction to Networks">
           <h3>Introduction to Networks</h3>
           <dl class="spec">
             <dt>Issuer</dt>
@@ -246,7 +254,7 @@
       </li>
 
       <li>
-        <article class="cert" data-cert="github" aria-label="GitHub Foundations">
+        <article class="cert" data-reveal data-cert="github" aria-label="GitHub Foundations">
           <h3>GitHub Foundations</h3>
           <dl class="spec">
             <dt>Issuer</dt>
@@ -258,7 +266,7 @@
       </li>
 
       <li>
-        <article class="cert" data-cert="linux" aria-label="Introduction to Linux">
+        <article class="cert" data-reveal data-cert="linux" aria-label="Introduction to Linux">
           <h3>Introduction to Linux</h3>
           <dl class="spec">
             <dt>Issuer</dt>
@@ -270,7 +278,7 @@
       </li>
 
       <li>
-        <article class="cert" data-cert="aws" aria-label="AWS Certified Cloud Practitioner">
+        <article class="cert" data-reveal data-cert="aws" aria-label="AWS Certified Cloud Practitioner">
           <h3>AWS Certified Cloud Practitioner</h3>
           <dl class="spec">
             <dt>Issuer</dt>
@@ -285,10 +293,10 @@
   </section>
 
   <section id="contact" class="contact" aria-label="Contact">
-    <h2 class="section-title">Contact</h2>
-    <p class="contact-line">Available for internships and graduate roles. The
+    <h2 class="section-title" data-reveal>Contact</h2>
+    <p class="contact-line" data-reveal>Available for internships and graduate roles. The
       fastest way to reach me is email.</p>
-    <address class="contact-list">
+    <address class="contact-list" data-reveal>
       <dl class="spec">
         <dt>Email</dt>
         <dd><a href="mailto:mamushahar2002@gmail.com">mamushahar2002@gmail.com</a></dd>
@@ -304,8 +312,8 @@
 
 <footer class="colophon">
   <p>&copy; <time datetime="2026">2026</time> Muhaimin Afif</p>
-  <p class="colophon-note">Hand-written semantic HTML and CSS. No framework, no build
-    step, no JavaScript.</p>
+  <p class="colophon-note">Hand-written semantic HTML and CSS. No framework and no
+    build step; one small script, for motion only.</p>
 </footer>
 
 </body>
