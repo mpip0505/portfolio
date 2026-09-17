@@ -436,29 +436,41 @@
 window.addEventListener('load', function(){
   var log = [];
   function state(tag){
-    var vis=[]; document.querySelectorAll('[data-projects] > li').forEach(function(li,i){ if(!li.hidden) vis.push(String(i+1).padStart(2,'0')); });
-    log.push(tag+' visible['+vis.join(',')+'] count="'+document.querySelector('[data-count]').textContent+
-      '" grid.is-in='+document.querySelector('[data-projects]').classList.contains('is-in')+
-      ' revealed='+document.querySelectorAll('[data-reveal].is-revealed').length+'/'+document.querySelectorAll('[data-reveal]').length);
+    try{
+      var vis=[]; document.querySelectorAll('[data-projects] > li').forEach(function(li,i){ if(!li.hidden) vis.push(String(i+1).padStart(2,'0')); });
+      log.push(tag+' visible['+vis.join(',')+'] count="'+document.querySelector('[data-count]').textContent+
+        '" grid.is-in='+document.querySelector('[data-projects]').classList.contains('is-in')+
+        ' revealed='+document.querySelectorAll('[data-reveal].is-revealed').length+'/'+document.querySelectorAll('[data-reveal]').length);
+    }catch(e){ log.push(tag+' ERROR '+e.message); }
+  }
+  function emit(){
+    var el=document.createElement('div'); el.id='PROBE-OUT';
+    el.textContent='@@'+log.join(' ||| ')+'@@';
+    document.body.appendChild(el);
   }
   setTimeout(function(){
-    state('t=900ms');
-    window.scrollTo(0, document.body.scrollHeight);
-    setTimeout(function(){
-      state('after scroll to bottom');
-      document.querySelector('[data-filters] button[data-filter="cloud"]').click();
+    try{
+      state('t900');
+      window.scrollTo(0, document.body.scrollHeight);
       setTimeout(function(){
-        state('after Cloud filter');
-        var cs = getComputedStyle(document.querySelector('[data-projects] > li:not([hidden])'));
-        log.push('first visible card: opacity='+cs.opacity+' transform='+cs.transform);
-        var hero = getComputedStyle(document.querySelector('.hero-name'));
-        log.push('hero-name: opacity='+hero.opacity+' transform='+hero.transform);
-        var out=document.createElement('pre');
-        out.style.cssText='position:fixed;inset:0;z-index:9999;background:#fff;color:#000;font:12.5px monospace;white-space:pre-wrap;padding:10px;margin:0';
-        out.textContent=log.join('\n'); document.body.appendChild(out);
-      }, 1200);
-    }, 1200);
-  }, 900);
+        try{
+          state('scrolled');
+          document.querySelector('[data-filters] button[data-filter="cloud"]').click();
+          setTimeout(function(){
+            try{
+              state('cloud');
+              var li=document.querySelector('[data-projects] > li:not([hidden])');
+              var cs=getComputedStyle(li);
+              log.push('card opacity='+cs.opacity+' transform='+cs.transform);
+              var h=getComputedStyle(document.querySelector('.hero-name'));
+              log.push('heroName opacity='+h.opacity+' transform='+h.transform);
+            }catch(e){ log.push('ERR3 '+e.message); }
+            emit();
+          },1200);
+        }catch(e){ log.push('ERR2 '+e.message); emit(); }
+      },1200);
+    }catch(e){ log.push('ERR1 '+e.message); emit(); }
+  },900);
 });
 </script>
 </body>

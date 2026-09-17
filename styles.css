@@ -4,6 +4,55 @@
    below: colour, type, rhythm and every animation timing live there.
    ========================================================================== */
 
+/* ==========================================================================
+   Metric-matched fallbacks
+
+   The two webfonts load with display=swap, which is what keeps the text
+   readable immediately — but it also means the page paints once in a local
+   font and once in the real one. If the two set at different widths, that
+   second paint is a reflow, and a reflow is layout shift.
+
+   So each fallback is redeclared here as a rescaled copy of itself: the
+   size-adjust is the measured width ratio between the real face and the
+   local one (Cormorant sets at 88% of Georgia, Inter at 107% of Helvetica
+   Neue), and the ascent and descent are overridden to the real face's own
+   metrics, divided by that same ratio, so the baseline lands in the same
+   place too. The swap then changes the shapes and nothing else.
+
+   src is local() only — no request is made, and if the local font is
+   missing the face simply fails and the next family in the stack is used.
+   Browsers without size-adjust ignore the descriptors and land exactly
+   where this site was before.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Cormorant Fallback";
+  src: local("Georgia"), local("Times New Roman");
+  size-adjust: 88%;
+  ascent-override: 104.5%;
+  descent-override: 33%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Cormorant Fallback";
+  font-style: italic;
+  src: local("Georgia Italic"), local("Georgia"), local("Times New Roman Italic");
+  size-adjust: 77.7%;
+  ascent-override: 118.4%;
+  descent-override: 37.3%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Helvetica Neue"), local("Arial");
+  size-adjust: 107%;
+  ascent-override: 90.6%;
+  descent-override: 22.4%;
+  line-gap-override: 0%;
+}
+
 :root {
 
   /* -- palette ------------------------------------------------------------
@@ -38,10 +87,10 @@
   --pine-line:  color-mix(in srgb, var(--cream) 22%, var(--pine));
 
   /* -- type ---------------------------------------------------------------- */
-  --serif: "Cormorant Garamond", Cormorant, Georgia, "Times New Roman",
-           "Iowan Old Style", serif;
-  --sans:  "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-           Roboto, "Helvetica Neue", Arial, sans-serif;
+  --serif: "Cormorant Garamond", Cormorant, "Cormorant Fallback", Georgia,
+           "Times New Roman", "Iowan Old Style", serif;
+  --sans:  "Inter", "Inter Fallback", ui-sans-serif, system-ui, -apple-system,
+           "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --track-wide: 0.16em;   /* uppercase nav / eyebrow letter-spacing */
   --track-mid:  0.09em;
@@ -53,21 +102,65 @@
   --measure: 62ch;
   --bio:     38.75rem;                       /* 620px hero bio measure       */
 
-  /* -- motion ---------------------------------------------------------------
-     Every duration and delay in the sheet reads from here. All of it is
-     inert unless motion.js has set data-motion="on" on <html>.              */
-  --ease:         cubic-bezier(0.22, 1, 0.36, 1);
-  --dur-micro:    200ms;   /* hover / focus feedback                        */
-  --dur-filter:   180ms;   /* legacy alias, kept for retuning               */
-  --dur-card:     420ms;   /* project card: reveal AND filter, one value    */
-  --dur-entrance: 560ms;   /* hero fade-up                                  */
-  --dur-reveal:   640ms;   /* scroll reveal                                 */
-  --dur-rule:     700ms;   /* hairline draw-in                              */
-  --stagger:      100ms;   /* hero step                                     */
-  --stagger-card: 55ms;    /* project card step                             */
-  --gem-delay:    640ms;   /* the gold diamond, last beat                   */
-  --lift:         4px;     /* card hover lift                               */
-  --drift:        24s;     /* contour drift cycle                           */
+  /* -- elevation ------------------------------------------------------------
+     Three steps: rest / hover / lifted. Layered and low-opacity, cast in a
+     warm brown rather than black so nothing goes grey against the cream.   */
+  --shade: #3B3226;                                  /* warm shadow ink     */
+
+  --shadow-1:
+    0 1px 2px  color-mix(in srgb, var(--shade)  9%, transparent),
+    0 2px 6px  color-mix(in srgb, var(--shade)  6%, transparent);
+
+  --shadow-2:
+    0 2px 4px  color-mix(in srgb, var(--shade) 10%, transparent),
+    0 8px 18px color-mix(in srgb, var(--shade)  9%, transparent);
+
+  --shadow-3:
+    0 3px 6px  color-mix(in srgb, var(--shade) 11%, transparent),
+    0 14px 34px color-mix(in srgb, var(--shade) 12%, transparent),
+    0 24px 56px color-mix(in srgb, var(--shade)  7%, transparent);
+
+  /* -- tuning knobs ----------------------------------------------------------
+     THE retune surface. Every duration, delay, angle and offset on the page
+     resolves back to the nine values in this block — the stylesheet derives
+     its own aliases from them below, and motion.js reads --tilt-max,
+     --tilt-lift and --parallax-depth straight off :root with
+     getComputedStyle, so JS never carries a number of its own.
+
+     All of it is inert unless motion.js has set data-motion="on" on <html>. */
+  --ease:            cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast:        200ms;   /* hover / focus feedback                     */
+  --dur:             500ms;   /* the default beat: entrances, filters       */
+  --dur-slow:        700ms;   /* rules drawing in, scroll reveals           */
+  --stagger:         100ms;   /* hero step                                  */
+
+  --tilt-max:        5deg;    /* card pointer-tilt cap                      */
+  --tilt-lift:       8px;     /* card translateZ on hover                   */
+  --parallax-depth:  12px;    /* max hero layer offset                      */
+  --perspective:     900px;   /* shared 3D viewing distance                 */
+
+  /* -- derived: timings the sheet uses by name ------------------------------ */
+  --dur-micro:    var(--dur-fast);   /* hover / focus feedback              */
+  --dur-filter:   var(--dur-fast);   /* filter out-phase                    */
+  --dur-card:     var(--dur);        /* project card: reveal AND filter     */
+  --dur-entrance: var(--dur);        /* hero fade-up                        */
+  --dur-reveal:   var(--dur-slow);   /* scroll reveal                       */
+  --dur-rule:     var(--dur-slow);   /* hairline draw-in                    */
+  --stagger-card: 55ms;              /* project card step                   */
+  --gem-delay:    calc(var(--stagger) * 6);  /* the diamond, last beat      */
+  --drift:        24s;               /* contour drift cycle                 */
+
+  /* -- derived: 3D --------------------------------------------------------- */
+  /* The three knobs motion.js parses must stay plain numbers: a custom
+     property is an untyped token stream, so getComputedStyle hands back
+     "calc(5deg * 0.7)" unevaluated and parseFloat gets nothing from it.
+     Values only CSS ever reads may use calc() freely, as --portrait-z and
+     --reveal-z do below. */
+  --hero-rot:     1.5deg;   /* hero group rotation cap     — read by JS */
+  --portrait-rot: 3.5deg;   /* portrait frame tilt         — read by JS */
+
+  --portrait-z:   calc(var(--tilt-lift) * 1.5);
+  --reveal-z:     calc(var(--tilt-lift) * -4); /* depth cards enter from    */
 }
 
 /* ==========================================================================
@@ -269,16 +362,30 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
   position: relative;
   isolation: isolate;   /* so the contours' z-index:-1 stays inside the hero */
   overflow: hidden;
+  text-align: center;
+  padding-block: clamp(4rem, 11vw, 7.5rem) clamp(3.5rem, 8vw, 6rem);
+
+  /* The hero is the viewing box for its three parallax planes. Setting
+     perspective here — not a transform — means the hero itself never moves,
+     so the planes inside it can travel in Z without touching layout. */
+  perspective: var(--perspective);
+  perspective-origin: 50% 40%;
+}
+
+/* The middle plane: everything you read. Owns the column layout the hero
+   used to own, so the wrapper costs nothing. */
+.hero-inner {
+  --plane: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(1.1rem, 2.5vw, 1.6rem);
-  text-align: center;
-  padding-block: clamp(4rem, 11vw, 7.5rem) clamp(3.5rem, 8vw, 6rem);
 }
 
 /* Decorative contour rings. Sized off the hero box, so no layout of its own. */
+/* The back plane. Furthest away, so it moves least of the three. */
 .contours {
+  --plane: 0.35;
   position: absolute;
   inset: -12% -8%;
   z-index: -1;
@@ -332,8 +439,16 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
   inline-size: min(22rem, 80%);
 }
 
-.divider-gem {
+/* The front plane. Nested inside .hero-inner, so it inherits that plane's
+   travel and adds its own on top — which is what puts it closest to you. */
+.gem-plane {
+  --plane: 0.8;
   flex: 0 0 auto;
+  display: block;
+}
+
+.divider-gem {
+  display: block;
   inline-size: 7px;
   block-size: 7px;
   background: var(--gold);
@@ -372,13 +487,13 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
   background: var(--pine);
   color: var(--cream);
   border-radius: 2px;
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--pine) 18%, transparent);
+  box-shadow: var(--shadow-1);
 }
 
 .btn--primary:hover,
 .btn--primary:focus-visible {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--pine) 22%, transparent);
+  box-shadow: var(--shadow-2);
 }
 
 .btn--quiet {
@@ -440,15 +555,34 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
 .portrait {
   position: relative;
   max-inline-size: 20rem;
+  perspective: var(--perspective);
+}
+
+/* The second frame: an empty offset outline sitting behind the photograph.
+   It is what makes the portrait read as a physical object above the page
+   rather than a picture printed on it. Absolute, so it costs no layout. */
+.portrait::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--hairline);
+  border-radius: 999px 999px 4px 4px;
+  transform: translate3d(10px, 12px, 0);
+  pointer-events: none;
 }
 
 .portrait-frame {
+  position: relative;      /* above the second frame */
   display: block;
   overflow: hidden;
   aspect-ratio: 3 / 4;
   border: 1px solid var(--hairline-2);
   border-radius: 999px 999px 4px 4px;
   background: var(--card);
+  box-shadow: var(--shadow-1);
+  transform-origin: center;
 }
 
 .portrait img {
@@ -560,7 +694,15 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
   display: grid;
   gap: clamp(2.25rem, 5vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
   grid-template-columns: minmax(0, 1fr);
+
+  /* The grid is the 3D container the cards enter through. */
+  perspective: var(--perspective);
 }
+
+/* Each card also gets its own viewing box, so a card in the right-hand
+   column tilts around its own centre instead of skewing away from the
+   middle of the grid. Same var, one viewing distance for the whole page. */
+.projects > li { perspective: var(--perspective); }
 
 @media (min-width: 40rem) {
   .projects { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -572,6 +714,7 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
 
 /* Borderless and editorial: the only chrome is the 2px pine top rule. */
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -579,6 +722,48 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
   block-size: 100%;
   padding-block-start: 1.25rem;
   border-block-start: 2px solid var(--pine);
+  transform-origin: center;
+}
+
+/* Two layers behind the text, both bleeding past the card on negative
+   insets so the words never move and neither layer is ever in the layout:
+
+   ::before  the raised surface — a warm panel that carries the elevation.
+             Invisible at rest, so the resting card stays flat and
+             borderless on the cream, exactly as drawn.
+   ::after   the sheen — a soft CREAM highlight that follows the cursor.
+             Never gold; gold stays rare.                                   */
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;                      /* behind the text, above the page      */
+  inset: 0 -1.1rem -1.15rem;        /* the pine rule caps the panel         */
+  border-radius: 0 0 3px 3px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card::before {
+  background: var(--card);
+  box-shadow: var(--shadow-1);
+}
+
+.card::after {
+  background: radial-gradient(
+    18rem 18rem at var(--sheen-x, 50%) var(--sheen-y, 0%),
+    color-mix(in srgb, #fff 70%, var(--cream)) 0%,
+    color-mix(in srgb, var(--cream) 45%, transparent) 40%,
+    transparent 72%);
+}
+
+/* Hover and keyboard focus raise the surface. Deliberately NOT gated on the
+   motion flag: under reduced motion the panel still appears, it just
+   appears instantly — flat elevation, immediate feedback, no movement. */
+.projects > li:hover .card::before,
+.projects > li:focus-within .card::before {
+  opacity: 1;
+  box-shadow: var(--shadow-2);
 }
 
 .card-meta {
@@ -822,18 +1007,8 @@ html[data-motion="on"] .contact-links a {
               transform var(--dur-micro) var(--ease);
 }
 
-/* Cards lift, and the numeral edges across as they do. */
-html[data-motion="on"] .projects > li .card,
-html[data-motion="on"] .card-num,
-html[data-motion="on"] .portrait img {
-  transition: transform var(--dur-micro) var(--ease),
-              border-color var(--dur-micro) var(--ease);
-}
-
-html[data-motion="on"] .projects > li:hover .card,
-html[data-motion="on"] .projects > li:focus-within .card {
-  transform: translateY(calc(var(--lift) * -1));
-  border-block-start-color: var(--gold);
+html[data-motion="on"] .card-num {
+  transition: transform var(--dur-fast) var(--ease);
 }
 
 html[data-motion="on"] .projects > li:hover .card-num,
@@ -841,12 +1016,109 @@ html[data-motion="on"] .projects > li:focus-within .card-num {
   transform: translateX(3px);
 }
 
-/* The portrait scales inside its fixed frame — the frame clips, so nothing
-   around it can move. */
-html[data-motion="on"] .portrait:hover img,
-html[data-motion="on"] .portrait:focus-within img {
-  transform: scale(1.03);
+/* -- 3D · project cards, the signature move --------------------------------
+   One transform declaration, four custom properties. CSS owns the shape of
+   the movement and the caps; motion.js only writes numbers into --tx, --ty,
+   --tz and the two sheen positions, which it derives from --tilt-max and
+   --tilt-lift read off :root. Retuning the feel means editing :root, never
+   this rule and never the script.                                          */
+
+html[data-motion="on"] .projects > li .card {
+  transform: rotateX(var(--tx, 0deg))
+             rotateY(var(--ty, 0deg))
+             translateZ(var(--tz, 0px));
+  transition: transform var(--dur-fast) var(--ease),
+              box-shadow var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
 }
+
+html[data-motion="on"] .card::before,
+html[data-motion="on"] .card::after {
+  transition: opacity var(--dur-fast) var(--ease),
+              box-shadow var(--dur-fast) var(--ease);
+}
+
+/* Hover with no pointer tracking yet — and the resting target the card
+   eases back down to when the cursor leaves. */
+html[data-motion="on"] .projects > li:hover .card,
+html[data-motion="on"] .projects > li:focus-within .card {
+  --tz: var(--tilt-lift);
+  border-block-start-color: var(--gold);
+}
+
+/* While the cursor is actually over the card, the transform follows it
+   frame by frame, so it must not also be chasing a 200ms transition. The
+   script smooths the values instead; the shadow still eases. */
+html[data-motion="on"] .card.is-tilting {
+  transition: box-shadow var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+  will-change: transform;
+}
+
+html[data-motion="on"] .card.is-tilting::before {
+  opacity: 1;
+  box-shadow: var(--shadow-3);          /* rest -> hover -> lifted */
+}
+
+html[data-motion="on"] .card.is-tilting::after { opacity: 1; }
+
+/* -- 3D · hero planes ------------------------------------------------------
+   Three layers, one pair of numbers. motion.js writes --px / --py (both
+   capped at --parallax-depth) and --hrx / --hry (capped at --hero-rot) onto
+   the hero; each layer multiplies them by its own --plane, so the back
+   plane drifts least and the gold diamond — nested inside the text plane,
+   so it collects both — drifts most. No transition: the script eases the
+   numbers themselves, which is smoother than easing three transforms.      */
+
+html[data-motion="on"] [data-contours] {
+  transform:
+    translate3d(calc(var(--px, 0px) * var(--plane)),
+                calc(var(--py, 0px) * var(--plane) + var(--parallax, 0px)),
+                0);
+}
+
+html[data-motion="on"] .hero-inner {
+  transform:
+    translate3d(calc(var(--px, 0px) * var(--plane)),
+                calc(var(--py, 0px) * var(--plane)), 0)
+    rotateX(var(--hrx, 0deg))
+    rotateY(var(--hry, 0deg));
+}
+
+html[data-motion="on"] .gem-plane {
+  transform: translate3d(calc(var(--px, 0px) * var(--plane)),
+                         calc(var(--py, 0px) * var(--plane)), 0);
+}
+
+/* -- 3D · the portrait ----------------------------------------------------- */
+
+html[data-motion="on"] .portrait-frame,
+html[data-motion="on"] .portrait::before {
+  transition: transform var(--dur-fast) var(--ease),
+              box-shadow var(--dur-fast) var(--ease);
+}
+
+html[data-motion="on"] .portrait-frame {
+  transform: rotateX(var(--prx, 0deg))
+             rotateY(var(--pry, 0deg))
+             translateZ(var(--pz, 0px))
+             scale(var(--ps, 1));
+}
+
+html[data-motion="on"] .portrait:hover .portrait-frame,
+html[data-motion="on"] .portrait:focus-within .portrait-frame {
+  --pz: var(--portrait-z);
+  --ps: 1.03;
+  box-shadow: var(--shadow-3);
+  will-change: transform;
+}
+
+/* The second frame slides a little further out as the photo lifts off it. */
+html[data-motion="on"] .portrait:hover::before,
+html[data-motion="on"] .portrait:focus-within::before {
+  transform: translate3d(16px, 19px, 0);
+}
+
 
 /* -- hero entrance: one staggered fade-up in reading order ----------------- */
 
@@ -903,12 +1175,10 @@ html[data-motion="on"] body.is-loaded [data-crest] svg {
   to   { transform: translate3d(5px, 3px, 0); }
 }
 
-/* Two layers: the wrapper takes the scroll parallax that motion.js writes
-   into --parallax, the inner svg takes the endless drift. They never fight. */
-html[data-motion="on"] [data-contours] {
-  transform: translate3d(0, var(--parallax, 0px), 0);
-}
-
+/* Three movements, and they never fight, because each owns a different
+   element: the wrapper is the back parallax plane above — it carries both
+   the pointer offset and the scroll offset motion.js writes into
+   --parallax — while the svg inside it takes the endless drift. */
 html[data-motion="on"] [data-contours] svg {
   animation: drift var(--drift) ease-in-out infinite alternate;
   will-change: transform;
@@ -919,7 +1189,12 @@ html[data-motion="on"] [data-contours] svg {
 
 html[data-motion="on"] [data-reveal] {
   opacity: 0;
-  transform: translateY(18px);
+  /* perspective() as a function, not a property: the section needs depth
+     for the duration of one entrance and has no 3D parent, and this way
+     nothing permanent is added to the page. Settles to none. */
+  transform: perspective(var(--perspective))
+             translate3d(0, 18px, var(--reveal-z))
+             rotateX(2deg);
   transition: opacity var(--dur-reveal) var(--ease),
               transform var(--dur-reveal) var(--ease);
 }
@@ -939,9 +1214,12 @@ html[data-motion="on"] .projects > li {
               transform var(--dur-card) var(--ease);
 }
 
+/* Cards enter from behind the page and settle flat. The Z is what does the
+   scaling, so leaving cards on a filter change read as receding rather than
+   merely shrinking — and .projects already supplies the perspective. */
 html[data-motion="on"] .projects:not(.is-in) > li {
   opacity: 0;
-  transform: translateY(14px) scale(0.985);
+  transform: translate3d(0, 14px, var(--reveal-z)) rotateX(2.5deg);
 }
 
 /* The count ticks over rather than snapping. */
@@ -956,9 +1234,35 @@ html[data-motion="on"] .count-n.is-ticking {
 }
 
 /* ==========================================================================
+   Touch — the second guard.
+   motion.js already declines to bind pointer tilt on a coarse pointer, so
+   nothing here should ever have anything to undo. It is here so that a
+   hybrid device that reports coarse after the script has bound, or a stale
+   inline value left on an element, still cannot leave a card tilted.
+   Scroll parallax is untouched: it is not a pointer effect.
+   ========================================================================== */
+
+@media (pointer: coarse) {
+  html[data-motion="on"] .projects > li .card,
+  html[data-motion="on"] .portrait-frame,
+  html[data-motion="on"] .hero-inner,
+  html[data-motion="on"] .gem-plane {
+    --tx: 0deg;  --ty: 0deg;
+    --prx: 0deg; --pry: 0deg;
+    --hrx: 0deg; --hry: 0deg;
+    --px: 0px;   --py: 0px;
+  }
+
+  .card::after { display: none; }       /* the sheen has no cursor to follow */
+}
+
+/* ==========================================================================
    Reduced motion — belt and braces. motion.js already declines to set the
-   flag, so none of the rules above match; this also catches the smooth
-   scroll and anything a browser animates on its own.
+   flag, so none of the rules above match: no entrance, no reveal, no
+   parallax, no tilt, and every element is already at its final state. What
+   survives is the flat elevation — the raised card surface and the portrait
+   shadow — plus instant hover and focus feedback. This block also catches
+   the smooth scroll and anything a browser animates on its own.
    ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {

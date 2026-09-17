@@ -8,6 +8,14 @@
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4EFE6">
 
+<!-- Tab icon: the flag-pin crest. The SVG is what modern browsers use and
+     the only one that stays crisp at any size; favicon.ico carries 16/32/48
+     bitmaps for older browsers and for the bare /favicon.ico request a
+     browser makes whether or not it is declared. -->
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&amp;family=Inter:wght@400;500;600&amp;display=swap">
@@ -51,10 +59,10 @@
   <!-- ====================================================================
        1 · Hero — centred masthead over faint contour rings.
        ==================================================================== -->
-  <section class="hero" aria-labelledby="hero-name">
+  <section class="hero" data-parallax aria-labelledby="hero-name">
 
     <!-- Decorative contour/topography rings. Pure layout wrapper. -->
-    <div class="contours" data-contours aria-hidden="true">
+    <div class="contours" data-contours data-plane="contours" aria-hidden="true">
       <svg viewBox="0 0 900 600" preserveAspectRatio="xMidYMid slice" focusable="false">
         <g fill="none" stroke="currentColor" stroke-width="1">
           <ellipse cx="450" cy="300" rx="90"  ry="58"/>
@@ -69,31 +77,38 @@
       </svg>
     </div>
 
-    <p class="eyebrow eyebrow--ruled" data-hero style="--i:0">
-      <span class="rule" data-rule aria-hidden="true"></span>
-      <span class="eyebrow-text">Est. Kuala Lumpur</span>
-      <span class="rule" data-rule aria-hidden="true"></span>
-    </p>
+    <!-- Pure layout wrapper: the masthead group, which is also the middle
+         parallax plane. The contours behind it move least, the gold diamond
+         nested inside it moves most. -->
+    <div class="hero-inner" data-plane="text">
 
-    <h1 id="hero-name" class="hero-name" data-hero style="--i:1">Afif</h1>
+      <p class="eyebrow eyebrow--ruled" data-hero style="--i:0">
+        <span class="rule" data-rule aria-hidden="true"></span>
+        <span class="eyebrow-text">Est. Kuala Lumpur</span>
+        <span class="rule" data-rule aria-hidden="true"></span>
+      </p>
 
-    <p class="hero-tagline" data-hero style="--i:2">Software Engineer — learning by building</p>
+      <h1 id="hero-name" class="hero-name" data-hero style="--i:1">Afif</h1>
 
-    <div class="divider" data-hero style="--i:3" aria-hidden="true">
-      <span class="rule" data-rule></span>
-      <span class="divider-gem" data-gem></span>
-      <span class="rule" data-rule></span>
-    </div>
+      <p class="hero-tagline" data-hero style="--i:2">Software Engineer — learning by building</p>
 
-    <p class="hero-bio" data-hero style="--i:4">A software engineering student who learns by
-      building. I fill my time with personal projects and hackathons — shipping small, real
-      systems and using AI to learn faster as I go — including a live delivery-tracking
-      platform in production and self-redeploying ML pipelines.</p>
+      <div class="divider" data-hero style="--i:3" aria-hidden="true">
+        <span class="rule" data-rule></span>
+        <span class="gem-plane" data-plane="gem"><span class="divider-gem" data-gem></span></span>
+        <span class="rule" data-rule></span>
+      </div>
 
-    <p class="hero-cta" data-hero style="--i:5">
-      <a class="btn btn--primary" href="#work">View the work</a>
-      <a class="btn btn--quiet" href="#contact">Get in touch</a>
-    </p>
+      <p class="hero-bio" data-hero style="--i:4">A software engineering student who learns by
+        building. I fill my time with personal projects and hackathons — shipping small, real
+        systems and using AI to learn faster as I go — including a live delivery-tracking
+        platform in production and self-redeploying ML pipelines.</p>
+
+      <p class="hero-cta" data-hero style="--i:5">
+        <a class="btn btn--primary" href="#work">View the work</a>
+        <a class="btn btn--quiet" href="#contact">Get in touch</a>
+      </p>
+
+    </div><!-- /.hero-inner -->
 
   </section>
 
@@ -109,13 +124,16 @@
     <!-- Pure layout wrapper: two columns on desktop, stacked on mobile. -->
     <div class="about-grid">
 
-      <figure class="portrait">
+      <figure class="portrait" data-portrait>
         <span class="portrait-frame">
-          <!-- TODO: assets/portrait.jpg is currently the original afif.jpeg,
-               copied over. Replace the file in place to swap the photo; if the
-               replacement is not 768x1024, update width/height below to match
+          <!-- assets/portrait.jpg is afif.jpeg resampled to 640x853 and
+               re-encoded — 137KB rather than 286KB. 640 is exactly twice the
+               320px box the frame caps at, so it is still sharp on a 2x
+               screen with nothing sent that the layout cannot use.
+               TODO: to swap the photo, replace the file in place; if the
+               replacement is not 640x853, update width/height below to match
                so the reserved box still prevents layout shift. -->
-          <img src="assets/portrait.jpg" width="768" height="1024" decoding="async"
+          <img src="assets/portrait.jpg" width="640" height="853" decoding="async"
             alt="Muhaimin Afif at the National Deep Tech Challenge, University of Malaya.">
         </span>
         <span class="portrait-pin" aria-hidden="true">
@@ -210,11 +228,12 @@
         </article>
       </li>
 
-      <li data-category="cv ml">
+      <li data-category="cv ml hackathon">
         <article class="card">
-          <p class="card-meta"><span class="card-num">03</span><span class="card-cat">Computer Vision · ML</span></p>
+          <p class="card-meta"><span class="card-num">03</span><span class="card-cat">Computer Vision · ML · Hackathon</span></p>
           <h3 class="card-title">Project Guardian</h3>
-          <p class="card-blurb">Maritime vessel detection from imagery, built on a YOLO detection pipeline.</p>
+          <p class="card-blurb">Maritime vessel detection from imagery, built at the SEDIC
+            Hackathon 2026 on a YOLO detection pipeline.</p>
           <ul class="tags">
             <li>Python</li>
             <li>YOLO</li>
@@ -246,7 +265,7 @@
       <li data-category="hackathon">
         <article class="card">
           <p class="card-meta"><span class="card-num">05</span><span class="card-cat">Hackathon</span></p>
-          <h3 class="card-title">SolarSense</h3>
+          <h3 class="card-title">Solare</h3>
           <p class="card-blurb">Deep-tech entry from the UM Deep Tech Hackathon.</p>
           <!-- TODO: no tech tags for this one — the previous build recorded the
                stack as "TBC". Add the real tags as <li> items below. -->

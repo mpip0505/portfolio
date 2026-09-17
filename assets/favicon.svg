@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Afif">
+  <title>Afif</title>
+  <!-- The site's own flag-pin crest, redrawn for a 16px tab: the thin
+       hairline pole and the ground ellipse both disappear at that size, so
+       the pole is thickened and the pennant enlarged, and the mark sits on
+       pine so it holds its shape against a light or a dark tab strip. -->
+  <rect width="64" height="64" rx="14" fill="#22453A"/>
+  <rect x="20.5" y="12" width="4" height="40" rx="2" fill="#B08A46"/>
+  <path d="M24.5 14 L46 21.75 L24.5 29.5 Z" fill="#B08A46"/>
+</svg>
