@@ -1,42 +1,73 @@
 /* ==========================================================================
    Muhaimin Afif — portfolio
-   Palette: five hex values. Everything else is derived with color-mix().
+   "Coastal links" — one stylesheet. Retune the site from the token block
+   below: colour, type, rhythm and every animation timing live there.
    ========================================================================== */
 
 :root {
-  /* -- palette ------------------------------------------------------------ */
-  --bg:     #e8edf1;  /* page — cool grey, deliberately not cream           */
-  --paper:  #ffffff;  /* raised surfaces                                    */
-  --ink:    #0f1c26;  /* body text                                          */
-  --mute:   #4d6376;  /* secondary text, metadata keys                      */
-  --accent: #0a5a86;  /* links, focus, emphasis rules                       */
 
-  /* -- derived ------------------------------------------------------------ */
-  --line:  color-mix(in srgb, var(--mute) 26%, transparent);
-  --line-strong: color-mix(in srgb, var(--mute) 45%, transparent);
-  --field: color-mix(in srgb, var(--accent) 6%, var(--paper));
+  /* -- palette ------------------------------------------------------------
+     The nine named values. Everything else in the sheet is derived from
+     these with color-mix(), so changing one here changes it everywhere. */
+  --cream:    #F4EFE6;   /* page background                                */
+  --sand:     #C9B48E;   /* dividers, hairlines, subtle fills              */
+  --gold:     #B08A46;   /* accent hairlines + the flag-pin crest ONLY     */
+  --gold-ink: #7E5F27;   /* link text on cream — 5.2:1 (bright gold fails) */
+  --sage:     #5C7A63;   /* small marks, pill fills, secondary accents     */
+  --slate:    #3E5765;   /* nav, secondary headings, muted text — 6.6:1    */
+  --pine:     #22453A;   /* primary deep green: headings, dark blocks      */
+  --ink:      #2A2A28;   /* body text                                      */
+  --card:     #FBF8F1;   /* warm off-white for raised surfaces             */
 
-  /* -- type --------------------------------------------------------------- */
-  --ui:   ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
-          "Liberation Mono", monospace;
+  /* -- derived: contrast-safe counterparts ---------------------------------
+     Two accessibility adjustments, both deliberate:
+     --sage-ink is --sage darkened to clear 4.5:1 on cream (raw --sage is
+       4.15:1, which fails for the small uppercase labels it is used on).
+     --gold-lift is the on-pine counterpart of --gold-ink: inside the dark
+       contact block the dark gold reads at 1.8:1, so links lighten instead.  */
+  --sage-ink:  #4C6653;                                    /* 5.5:1 on cream */
+  --gold-lift: #D9BE84;                                    /* 5.9:1 on pine  */
 
-  /* -- rhythm ------------------------------------------------------------- */
-  --gap:  1.5rem;
-  --rule: 1px;
+  --hairline:   color-mix(in srgb, var(--sand) 70%, var(--cream));
+  --hairline-2: var(--sand);
+  --tag-fill:   color-mix(in srgb, var(--sand) 26%, var(--card));
+  --pill-fill:  color-mix(in srgb, var(--sage) 18%, var(--card));
+  --numeral:    color-mix(in srgb, var(--pine) 60%, var(--cream));   /* 3.2:1 */
+  --on-pine:    color-mix(in srgb, var(--cream) 82%, var(--pine));   /* 6.8:1 */
+  --on-pine-2:  color-mix(in srgb, var(--cream) 70%, var(--pine));   /* 5.5:1 */
+  --pine-line:  color-mix(in srgb, var(--cream) 22%, var(--pine));
+
+  /* -- type ---------------------------------------------------------------- */
+  --serif: "Cormorant Garamond", Cormorant, Georgia, "Times New Roman",
+           "Iowan Old Style", serif;
+  --sans:  "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+           Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --track-wide: 0.16em;   /* uppercase nav / eyebrow letter-spacing */
+  --track-mid:  0.09em;
+
+  /* -- rhythm --------------------------------------------------------------- */
+  --shell:   72rem;                          /* max content width            */
+  --gutter:  clamp(1.25rem, 5vw, 3rem);      /* page side padding            */
+  --section: clamp(3.5rem, 8vw, 6rem);       /* vertical section rhythm      */
   --measure: 62ch;
-}
+  --bio:     38.75rem;                       /* 620px hero bio measure       */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:     #0d1418;
-    --paper:  #131c22;
-    --ink:    #e6edf2;
-    --mute:   #9fb2c0;
-    --accent: #6fb4de;
-    --field:  color-mix(in srgb, var(--accent) 9%, var(--paper));
-  }
+  /* -- motion ---------------------------------------------------------------
+     Every duration and delay in the sheet reads from here. All of it is
+     inert unless motion.js has set data-motion="on" on <html>.              */
+  --ease:         cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-micro:    200ms;   /* hover / focus feedback                        */
+  --dur-filter:   180ms;   /* legacy alias, kept for retuning               */
+  --dur-card:     420ms;   /* project card: reveal AND filter, one value    */
+  --dur-entrance: 560ms;   /* hero fade-up                                  */
+  --dur-reveal:   640ms;   /* scroll reveal                                 */
+  --dur-rule:     700ms;   /* hairline draw-in                              */
+  --stagger:      100ms;   /* hero step                                     */
+  --stagger-card: 55ms;    /* project card step                             */
+  --gem-delay:    640ms;   /* the gold diamond, last beat                   */
+  --lift:         4px;     /* card hover lift                               */
+  --drift:        24s;     /* contour drift cycle                           */
 }
 
 /* ==========================================================================
@@ -45,757 +76,901 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-body, h1, h2, h3, h4, p, ul, li, dl, dt, dd, figure, address {
-  margin: 0;
-  padding: 0;
-}
+body, h1, h2, h3, h4, p, ul, ol, li, dl, dt, dd, figure, figcaption,
+address, blockquote { margin: 0; padding: 0; }
 
-ul { list-style: none; }
+ul, ol { list-style: none; }
 
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  /* Anchor targets clear the sticky masthead without JS. */
-  scroll-padding-block-start: 5rem;
-}
-
-/* Below ~34rem the masthead wraps the role onto its own line and the five nav
-   items onto two, standing taller than the 5rem above — without this a nav
-   jump lands with the heading hidden under the sticky bar. */
-@media (max-width: 34rem) {
-  html { scroll-padding-block-start: 8.5rem; }
 }
 
 body {
-  background: var(--bg);
+  background: var(--cream);
   color: var(--ink);
-  font-family: var(--ui);
-  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
-  line-height: 1.6;
-  text-underline-offset: 0.18em;
-  /* Reserve the full viewport so a short page never reflows the footer. */
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
+
+img, svg { display: block; max-width: 100%; }
+img { height: auto; }
+
+button { font: inherit; color: inherit; }
 
 /* ==========================================================================
    Typography
    ========================================================================== */
 
-h1, h2, h3, h4 {
-  line-height: 1.2;
-  font-weight: 650;
-  letter-spacing: -0.015em;
+h1, h2, h3 {
+  font-family: var(--serif);
+  font-weight: 600;
+  line-height: 1.12;
+  color: var(--pine);
   text-wrap: balance;
 }
 
-h1 { font-size: clamp(1.75rem, 1.35rem + 2vw, 2.75rem); }
-h2 { font-size: clamp(1.05rem, 1rem + 0.3vw, 1.2rem); }
-h3 { font-size: clamp(1.15rem, 1.05rem + 0.6vw, 1.5rem); }
-h4 { font-size: 0.95rem; }
+h3 { font-weight: 500; }
 
-p { text-wrap: pretty; max-width: var(--measure); }
-
-strong { font-weight: 650; }
+p { text-wrap: pretty; }
 
 abbr[title] {
-  text-decoration: underline dotted;
+  text-decoration: underline dotted
+    color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: 3px;
   cursor: help;
 }
 
-a {
-  color: var(--accent);
-  text-decoration-thickness: 1px;
+a { color: var(--gold-ink); }
+
+/* The shared small-caps label: eyebrows, nav, filters, meta rows. */
+.eyebrow,
+.card-cat,
+.entry-note,
+.nav-list a,
+.filters button {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
 }
 
-a:hover { text-decoration-thickness: 2px; }
+.eyebrow { color: var(--sage-ink); }
 
 /* ==========================================================================
-   Accessibility
+   Accessibility floor
    ========================================================================== */
 
 .skip {
-  position: absolute;
+  position: fixed;
+  z-index: 100;
   inset-block-start: 0.5rem;
   inset-inline-start: 0.5rem;
-  z-index: 10;
   padding: 0.6rem 1rem;
-  background: var(--accent);
-  color: var(--paper);
-  font-weight: 600;
+  background: var(--pine);
+  color: var(--cream);
+  font-size: 0.85rem;
   text-decoration: none;
   border-radius: 2px;
-  /* Hidden by translation, not display — no layout involvement either way. */
   transform: translateY(-200%);
 }
 
 .skip:focus-visible { transform: translateY(0); }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--gold-ink);
   outline-offset: 3px;
   border-radius: 1px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+.contact :focus-visible { outline-color: var(--gold-lift); }
 
 /* ==========================================================================
    Shell
    ========================================================================== */
 
-.masthead,
-main,
-.colophon {
-  width: 100%;
-  max-width: 60rem;
+.masthead > *,
+main > section,
+.contact {
+  max-width: var(--shell);
   margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 2.5rem);
+  padding-inline: var(--gutter);
 }
 
-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(3rem, 7vw, 5rem);
-  padding-block: clamp(2.5rem, 6vw, 4.5rem);
-}
+main > section { padding-block: var(--section); }
+
+main > section + section { border-block-start: 1px solid var(--hairline); }
 
 /* ==========================================================================
-   Masthead
+   1 · Header — centred masthead, nav split around the crest
    ========================================================================== */
 
 .masthead {
   position: sticky;
   inset-block-start: 0;
-  z-index: 5;
+  z-index: 20;
+  background: var(--cream);
+  border-block-end: 1px solid var(--hairline);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 4vw, 2.5rem);
+  padding-block: 1.1rem;
+}
+
+.nav-list {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3.5vw, 2.25rem);
+  flex: 1 1 0;
+}
+
+.nav-list:first-of-type { justify-content: flex-end; }
+.nav-list:last-of-type  { justify-content: flex-start; }
+
+.nav-list a {
+  position: relative;
+  display: inline-block;
+  padding-block-end: 3px;
+  color: var(--slate);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Underline grows from the start edge. A pseudo-element, so no reflow. */
+.nav-list a::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.nav-list a:hover,
+.nav-list a:focus-visible { color: var(--gold-ink); }
+
+.nav-list a:hover::after,
+.nav-list a:focus-visible::after { transform: scaleX(1); }
+
+/* Below ~26rem the five nav items plus the crest no longer fit on one line at
+   full size, so the row tightens rather than wrapping or overflowing. */
+@media (max-width: 26rem) {
+  .nav { gap: 0.7rem; }
+  .nav-list { gap: 0.85rem; }
+  .nav-list a { font-size: 0.625rem; letter-spacing: 0.1em; }
+  .crest svg { inline-size: 18px; block-size: 18px; }
+}
+
+/* The crest. The only gold on the page above the fold, besides the diamond. */
+.crest {
+  flex: 0 0 auto;
+  display: block;
+  color: var(--gold);
+}
+
+.crest svg { transform-origin: 31% 90%; }
+
+/* ==========================================================================
+   2 · Hero
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  isolation: isolate;   /* so the contours' z-index:-1 stays inside the hero */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.1rem, 2.5vw, 1.6rem);
+  text-align: center;
+  padding-block: clamp(4rem, 11vw, 7.5rem) clamp(3.5rem, 8vw, 6rem);
+}
+
+/* Decorative contour rings. Sized off the hero box, so no layout of its own. */
+.contours {
+  position: absolute;
+  inset: -12% -8%;
+  z-index: -1;
+  color: var(--slate);
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+.contours svg { inline-size: 100%; block-size: 100%; }
+
+/* Hairline rule. Flex child, so it has a box before it is ever animated. */
+.rule {
+  flex: 1 1 auto;
+  block-size: 1px;
+  min-inline-size: 1.5rem;
+  background: var(--hairline-2);
+  transform-origin: center;
+}
+
+.eyebrow--ruled {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 3vw, 1.25rem);
+  inline-size: min(26rem, 100%);
+}
+
+.eyebrow-text { flex: 0 0 auto; }
+
+.hero-name {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(4.5rem, 18vw, 10rem);
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  color: var(--pine);
+}
+
+.hero-tagline {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.15rem, 1rem + 1.4vw, 1.75rem);
+  line-height: 1.4;
+  color: var(--slate);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  inline-size: min(22rem, 80%);
+}
+
+.divider-gem {
+  flex: 0 0 auto;
+  inline-size: 7px;
+  block-size: 7px;
+  background: var(--gold);
+  transform: rotate(45deg);
+}
+
+.hero-bio {
+  max-inline-size: var(--bio);
+  color: var(--ink);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.25rem, 4vw, 2rem);
+  margin-block-start: 0.5rem;
+}
+
+/* -- buttons -------------------------------------------------------------- */
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+}
+
+.btn--primary {
+  padding: 0.85rem 1.75rem;
+  background: var(--pine);
+  color: var(--cream);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--pine) 18%, transparent);
+}
+
+.btn--primary:hover,
+.btn--primary:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--pine) 22%, transparent);
+}
+
+.btn--quiet {
+  padding-block-end: 4px;
+  color: var(--gold-ink);
+  border-block-end: 1px solid var(--hairline-2);
+}
+
+.btn--quiet:hover,
+.btn--quiet:focus-visible { border-block-end-color: var(--gold); }
+
+/* ==========================================================================
+   Section heads
+   ========================================================================== */
+
+.section-head { margin-block-end: clamp(2rem, 5vw, 3rem); }
+
+.section-title {
+  font-size: clamp(1.9rem, 1.4rem + 2vw, 2.9rem);
+  font-weight: 500;
+  margin-block-start: 0.4rem;
+}
+
+.section-head--work {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  column-gap: 0.75rem;
-  row-gap: 0.25rem;
-  padding-block: 0.9rem;
-  /* Sticky bar sits on the page colour, so it needs to be opaque. */
-  background: var(--bg);
-  border-block-end: var(--rule) solid var(--line);
-  /* Two lines on mobile, one on desktop — reserved either way. */
-  min-height: 4rem;
+  gap: 0.4rem 1.5rem;
 }
 
-.masthead-name {
-  font-size: 1rem;
-  letter-spacing: -0.01em;
-}
+.section-head--work .eyebrow { flex-basis: 100%; }
 
-.masthead-role {
-  font-family: var(--mono);
+.count {
+  margin-inline-start: auto;
+  color: var(--slate);
   font-size: 0.8125rem;
-  color: var(--mute);
+  letter-spacing: 0.02em;
 }
 
-.masthead-nav { margin-inline-start: auto; }
-
-.navlist {
-  display: flex;
-  gap: clamp(0.75rem, 3vw, 1.5rem);
-  font-size: 0.875rem;
-}
-
-.navlist a {
-  color: var(--mute);
-  text-decoration: none;
-  padding-block: 0.25rem;
-  border-block-end: 2px solid transparent;
-}
-
-.navlist a:hover,
-.navlist a:focus-visible {
-  color: var(--ink);
-  border-block-end-color: var(--accent);
-}
+.count-n { display: inline-block; font-variant-numeric: tabular-nums; }
 
 /* ==========================================================================
-   Intro
+   3 · About
    ========================================================================== */
 
-.intro {
-  /* flow-root, not flex, so the portrait can float beside the text on wide
-     screens. Vertical rhythm between the text blocks is set with explicit
-     margins below. */
-  display: flow-root;
+.about-grid {
+  display: grid;
+  gap: clamp(2rem, 6vw, 3.5rem);
+  align-items: start;
 }
 
-/* Portrait. The frame carries the aspect-ratio, so the box is reserved before
-   the file loads — zero layout shift. Stacked on top on mobile; floats to a
-   right rail from 40rem up. */
+@media (min-width: 48rem) {
+  .about-grid { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); }
+}
+
+/* Portrait. The frame owns the aspect-ratio and the overflow, so the box is
+   reserved before the file arrives and the hover scale has something to
+   scale inside. */
 .portrait {
-  margin: 0 0 1.5rem;
-  max-inline-size: 11rem;
+  position: relative;
+  max-inline-size: 20rem;
 }
 
 .portrait-frame {
   display: block;
-  aspect-ratio: 1 / 1;
   overflow: hidden;
-  border-radius: 6px;
-  border: var(--rule) solid var(--line-strong);
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--hairline-2);
+  border-radius: 999px 999px 4px 4px;
+  background: var(--card);
 }
 
-/* The source is a full-body shot in a large hall, so at rail width the subject
-   reads as a speck. Crop in on him and the two award boards — anchor the scale
-   on that point and let the frame clip the empty screen and floor. */
 .portrait img {
-  display: block;
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
-  scale: 1.7;
-  transform-origin: 73% 92%;
+  object-position: 50% 22%;
+  transform-origin: center;
+}
+
+.portrait-pin {
+  position: absolute;
+  inset-block-end: 2.35rem;
+  inset-inline-end: -0.85rem;
+  display: grid;
+  place-items: center;
+  inline-size: 2.1rem;
+  block-size: 2.1rem;
+  color: var(--gold);
+  background: var(--cream);
+  border: 1px solid var(--hairline-2);
+  border-radius: 50%;
 }
 
 .portrait figcaption {
-  margin-block-start: 0.6rem;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  line-height: 1.35;
-  color: var(--mute);
+  margin-block-start: 0.9rem;
+  color: var(--slate);
+  font-size: 0.8125rem;
+  line-height: 1.5;
 }
 
-.lede {
-  font-size: 1.0625em;
-  color: var(--mute);
-  margin-block-start: 1.25rem;
-  /* Four lines at the narrowest layout — prose edits never move the dl. */
-  min-height: 7.5rem;
+.about-body p {
+  max-inline-size: var(--measure);
+  font-size: 1.0625rem;
+  line-height: 1.75;
 }
+
+.about-body p + p { margin-block-start: 1rem; }
 
 .facts {
+  margin-block-start: 2rem;
+  padding-block-start: 1.5rem;
+  border-block-start: 1px solid var(--hairline);
   display: grid;
-  grid-template-columns: max-content 1fr;
-  column-gap: 1.25rem;
-  row-gap: 0.4rem;
-  align-items: baseline;
-  font-family: var(--mono);
-  font-size: 0.8125rem;
-  margin-block-start: 1.5rem;
-  padding-block-start: 1.25rem;
-  border-block-start: var(--rule) solid var(--line);
+  gap: 0.35rem 1.5rem;
 }
 
-@media (min-width: 40rem) {
-  .portrait {
-    float: inline-end;
-    inline-size: 14rem;
-    max-inline-size: 40%;
-    margin-inline-start: 2rem;
-  }
+@media (min-width: 30rem) {
+  .facts { grid-template-columns: 8.5rem minmax(0, 1fr); }
 }
 
 .facts dt {
-  color: var(--mute);
+  color: var(--sage-ink);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.6875rem;
+  align-self: center;
 }
 
 .facts dd {
   color: var(--ink);
-  /* One line minimum, so a longer status string cannot collapse the row. */
-  min-height: 1.4em;
+  font-size: 0.9375rem;
+}
+
+.facts dd + dt { margin-block-start: 0.75rem; }
+
+@media (min-width: 30rem) {
+  .facts dd + dt { margin-block-start: 0; }
+  .facts dt, .facts dd { padding-block: 0.35rem; }
 }
 
 /* ==========================================================================
-   Colophon
+   4 · Work — filter bar + project grid
    ========================================================================== */
 
-.colophon {
+.filters {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.5rem 1.5rem;
-  padding-block: 1.75rem;
-  border-block-start: var(--rule) solid var(--line);
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--mute);
-  min-height: 5rem;
-}
-
-.colophon-note { max-width: 34ch; }
-
-/* ==========================================================================
-   Section titles
-   ========================================================================== */
-
-.section-title {
-  font-family: var(--mono);
-  font-weight: 600;
-  font-size: 0.8125rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--mute);
-  padding-block-end: 0.75rem;
-  margin-block-end: 2rem;
-  border-block-end: var(--rule) solid var(--line);
-}
-
-/* ==========================================================================
-   Work — one repeatable article pattern.
-   No :nth-child, no counters, no per-project selectors: adding another
-   <article> needs zero CSS changes. Weight is switched by data-emphasis only.
-   ========================================================================== */
-
-.work {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.project {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: clamp(1.25rem, 4vw, 2rem);
-  background: var(--paper);
-  border: var(--rule) solid var(--line);
-  border-inline-start: 3px solid var(--line-strong);
-  border-radius: 4px;
-}
-
-.project h3 { min-height: 1.2em; }
-
-/* The signature: monospace key/value metadata. */
-.spec {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  column-gap: 1rem;
-  row-gap: 0.35rem;
-  align-items: baseline;
-  font-family: var(--mono);
-  font-size: 0.78125rem;
-  line-height: 1.45;
-  padding: 0.85rem 1rem;
-  background: var(--field);
-  border: var(--rule) solid var(--line);
-  border-radius: 3px;
-}
-
-.spec dt {
-  color: var(--mute);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.6875rem;
-  white-space: nowrap;
-}
-
-.spec dd {
-  color: var(--ink);
-  min-height: 1.45em;
-  /* Long unbroken tokens (URLs, emails, issuer names) wrap inside the 1fr
-     column instead of forcing horizontal overflow at 320px. */
-  overflow-wrap: break-word;
-  min-inline-size: 0;
-}
-
-.outcomes {
-  display: flex;
-  flex-direction: column;
   gap: 0.5rem;
-  max-width: var(--measure);
+  margin-block-end: clamp(2rem, 5vw, 2.75rem);
 }
 
-.outcomes li {
-  position: relative;
-  padding-inline-start: 1.25rem;
-  color: var(--mute);
-  font-size: 0.9375rem;
+.filters button {
+  padding: 0.55rem 1.05rem;
+  background: transparent;
+  color: var(--slate);
+  border: 1px solid var(--hairline-2);
+  border-radius: 2px;
+  cursor: pointer;
 }
 
-.outcomes li::before {
-  content: "";
-  position: absolute;
-  inset-inline-start: 0.1rem;
-  inset-block-start: 0.6em;
-  inline-size: 0.5rem;
-  block-size: 1px;
-  background: var(--accent);
+.filters button:hover,
+.filters button:focus-visible {
+  color: var(--pine);
+  border-color: var(--gold);
 }
 
-.links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  font-family: var(--mono);
-  font-size: 0.8125rem;
+.filters button[aria-pressed="true"] {
+  background: var(--pine);
+  color: var(--cream);
+  border-color: var(--pine);
 }
 
-.links a {
-  text-decoration: none;
-  padding-block-end: 1px;
-  border-block-end: 1px solid var(--line-strong);
-}
+.filters button[aria-pressed="true"]:hover,
+.filters button[aria-pressed="true"]:focus-visible { color: var(--cream); }
 
-.links a:hover,
-.links a:focus-visible { border-block-end-color: var(--accent); }
-
-/* ==========================================================================
-   Stack
-   ========================================================================== */
-
-.stackgrid {
+.projects {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: 1.5rem;
+  gap: clamp(2.25rem, 5vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.stackgroup {
+@media (min-width: 40rem) {
+  .projects { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 64rem) {
+  .projects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Borderless and editorial: the only chrome is the 2px pine top rule. */
+.card {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  padding-block-start: 0.85rem;
-  border-block-start: 2px solid var(--line-strong);
+  align-items: flex-start;
+  gap: 0.6rem;
+  block-size: 100%;
+  padding-block-start: 1.25rem;
+  border-block-start: 2px solid var(--pine);
 }
 
-.stackgroup h3 {
-  font-size: 0.9375rem;
+.card-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.card-num {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 2.25rem;
+  line-height: 1;
+  color: var(--numeral);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.card-cat { color: var(--sage-ink); }
+
+.card-title {
+  font-size: 1.4rem;
+  line-height: 1.2;
+  color: var(--pine);
+}
+
+.pill {
+  align-self: flex-start;
+  padding: 0.15rem 0.6rem;
+  background: var(--pill-fill);
+  color: var(--sage-ink);
+  border-radius: 999px;
+  font-size: 0.6875rem;
   font-weight: 600;
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+}
+
+.card-blurb {
+  color: var(--ink);
+  font-size: 0.9375rem;
+  line-height: 1.6;
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  font-family: var(--mono);
-  font-size: 0.75rem;
+  margin-block-start: 0.15rem;
 }
 
 .tags li {
-  padding: 0.3rem 0.55rem;
-  background: var(--field);
-  border: var(--rule) solid var(--line);
-  border-radius: 3px;
-  color: var(--mute);
-  white-space: nowrap;
+  padding: 0.25rem 0.6rem;
+  background: var(--tag-fill);
+  color: var(--slate);
+  border-radius: 2px;
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+}
+
+.tags-pending { font-style: italic; }
+
+.card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-block-start: auto;
+  padding-block-start: 0.9rem;
+}
+
+.card-links a {
+  color: var(--gold-ink);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-block-end: 1px solid var(--hairline-2);
+  padding-block-end: 2px;
+}
+
+.card-links a:hover,
+.card-links a:focus-visible { border-block-end-color: var(--gold); }
+
+.link-pending {
+  color: var(--slate);
+  font-size: 0.8125rem;
+  font-style: italic;
 }
 
 /* ==========================================================================
-   Certifications — reuses the .spec metadata treatment. The list is an
-   auto-fit grid, so a 4th or 5th <li> appended in the markup needs no CSS
-   change: no counts, no positional selectors.
+   5 · Ruled lists — achievements and certifications
    ========================================================================== */
 
-/* Two-up at desktop: with four certs that fills both rows evenly instead of
-   leaving an orphan card, and the wider column keeps issuer names off a third
-   wrapped line. The <li> is the grid item, so it stretches to the row height —
-   the card inside flexes to fill it, making every box in a row identical. */
-.certlist {
+.ruled-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-  /* Equal rows, so a card whose issuer name wraps does not make its row taller
-     than the other — all four boxes end up the same size. */
-  grid-auto-rows: 1fr;
-  gap: 1.5rem;
+  gap: 0;
+  border-block-start: 1px solid var(--hairline);
 }
 
-.certlist > li {
-  display: flex;
+@media (min-width: 48rem) {
+  .ruled-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ruled-list > li:nth-child(odd):not(:last-child) {
+    border-inline-end: 1px solid var(--hairline);
+  }
+  .ruled-list > li:nth-child(odd) .entry { padding-inline-end: 2rem; }
+  .ruled-list > li:nth-child(even) .entry { padding-inline-start: 2rem; }
 }
 
-.cert {
-  /* Each card reserves a badge gutter on the inline-start now. A future
-     <figure> is absolutely placed into it, so adding a badge shifts
-     nothing in either axis. --badge is the single source of that size. */
-  --badge: 2rem;
-  position: relative;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 0.75rem;
-  min-height: calc(var(--badge) + 2 * clamp(1.1rem, 3vw, 1.5rem));
-  padding: clamp(1.1rem, 3vw, 1.5rem);
-  padding-inline-start: calc(clamp(1.1rem, 3vw, 1.5rem) + var(--badge) + 0.85rem);
-  background: var(--paper);
-  border: var(--rule) solid var(--line);
-  border-inline-start: 3px solid var(--line-strong);
-  border-radius: 4px;
+.ruled-list > li { border-block-end: 1px solid var(--hairline); }
+
+.entry { padding-block: 1.5rem; }
+
+.entry h3 {
+  font-size: 1.25rem;
+  line-height: 1.25;
+  color: var(--pine);
 }
 
-.cert h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  min-height: 1.2em;
+.entry-meta {
+  margin-block-start: 0.3rem;
+  color: var(--slate);
+  font-size: 0.875rem;
 }
 
-/* Reserved badge slot. No <figure> exists yet; when one is added its box is
-   already sized and positioned, so the image causes zero layout shift. */
-.cert figure {
-  position: absolute;
-  inset-block-start: clamp(1.1rem, 3vw, 1.5rem);
-  inset-inline-start: clamp(1.1rem, 3vw, 1.5rem);
-  inline-size: var(--badge);
-  block-size: var(--badge);
-  aspect-ratio: 1 / 1;
-  margin: 0;
+.entry-note {
+  margin-block-start: 0.55rem;
+  color: var(--sage-ink);
 }
 
-.cert figure img {
-  inline-size: 100%;
-  block-size: 100%;
-  object-fit: contain;
-}
-
-/* Cert cards are narrow at three-up, so the spec runs tighter here to give
-   the value column room — long issuer names wrap at spaces, not mid-word. */
-.cert .spec {
-  /* Fills the leftover card height so the inner panels line up bottom-to-bottom
-     across a row, not just the outer cards. */
-  flex: 1;
-  padding: 0.7rem 0.8rem;
-  column-gap: 0.6rem;
-}
-
-/* Status reuses the monospace utility face and reads as a piece of the
-   metadata, not a decorative pill. */
-.cert-status {
-  font-family: var(--mono);
-  font-size: 0.78125rem;
-}
+.entry-note[data-status="in-progress"] { color: var(--slate); }
 
 /* ==========================================================================
-   Achievements — the same grid contract as .certlist: auto-fit columns, equal
-   rows, no counts and no positional selectors, so a fourth <li> appended in
-   the markup needs no CSS change. The <li> is the grid item and stretches to
-   the row height; the card inside flexes to fill it.
+   6 · Stack
    ========================================================================== */
 
-.awardlist {
+.stack-groups {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  grid-auto-rows: 1fr;
-  gap: 1.5rem;
+  gap: clamp(1.75rem, 4vw, 2.5rem);
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.awardlist > li {
-  display: flex;
+@media (min-width: 34rem) {
+  .stack-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-.award {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 0.6rem;
-  padding: clamp(1.1rem, 3vw, 1.5rem);
-  background: var(--paper);
-  border: var(--rule) solid var(--line);
-  border-inline-start: 3px solid var(--line-strong);
-  border-radius: 4px;
+@media (min-width: 60rem) {
+  .stack-groups { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
-.award h3 { min-height: 1.2em; }
-
-/* The result is the payload of the card. Reserved at two lines, so a longer
-   citation cannot push the spec panel down relative to its neighbours. */
-.award-result {
-  min-height: 2.4em;
-}
-
-/* Fills the leftover card height so the spec panels line up bottom-to-bottom
-   across a row, exactly as they do on the certification cards. */
-.award .spec {
-  flex: 1;
-  padding: 0.7rem 0.8rem;
-  column-gap: 0.6rem;
+.stack-group h3 {
+  font-size: 1.15rem;
+  padding-block-end: 0.6rem;
+  margin-block-end: 0.9rem;
+  border-block-end: 1px solid var(--hairline);
 }
 
 /* ==========================================================================
-   Contact
+   7 · Contact / footer — the pine block
    ========================================================================== */
 
 .contact {
+  max-inline-size: none;
+  background: var(--pine);
+  color: var(--on-pine);
+  text-align: center;
+  padding-block: clamp(3.5rem, 8vw, 5.5rem);
+}
+
+.contact > * { max-inline-size: var(--shell); margin-inline: auto; }
+
+.crest--footer { color: var(--gold); }
+.crest--footer svg { margin-inline: auto; }
+
+.contact-title {
+  margin-block-start: 1.25rem;
+  color: var(--cream);
+  font-weight: 500;
+  font-size: clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+}
+
+.contact-line {
+  margin-block-start: 0.85rem;
+  max-inline-size: 34rem;
+  color: var(--on-pine);
+  font-size: 0.9375rem;
+}
+
+.contact-links {
+  margin-block-start: 2rem;
+  font-style: normal;
+}
+
+.contact-links ul {
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem clamp(1.25rem, 4vw, 2.5rem);
 }
 
-.contact-line { color: var(--mute); }
-
-.contact-list { font-style: normal; }
-
-.contact-list .spec { max-width: 34rem; }
-
-.contact-list .spec a {
+.contact-links a {
+  color: var(--gold-lift);
   text-decoration: none;
-  border-block-end: 1px solid var(--line-strong);
+  font-size: 0.9375rem;
+  border-block-end: 1px solid var(--pine-line);
+  padding-block-end: 3px;
 }
 
-.contact-list .spec a:hover,
-.contact-list .spec a:focus-visible { border-block-end-color: var(--accent); }
+.contact-links a:hover,
+.contact-links a:focus-visible { border-block-end-color: var(--gold-lift); }
 
-/* -- lead emphasis ------------------------------------------------------- */
-/* Heavier treatment, driven only by the attribute. */
-.project[data-emphasis="lead"] {
-  border-inline-start-color: var(--accent);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 8%, transparent);
-}
-
-.project[data-emphasis="lead"] h3 {
-  font-size: clamp(1.35rem, 1.1rem + 1vw, 1.75rem);
-}
-
-/* Every project card — lead or compact — uses the one stacked layout from
-   `.project` above: title, full-width spec band, prose, outcomes, links.
-   Lead cards differ only in the accent border, shadow and larger title, not
-   in structure, so cards stay visually consistent at every viewport width
-   with no breakpoint where the layout reflows into columns. */
-
-/* ==========================================================================
-   Icons
-   Inline SVG delivered through CSS mask-image, filled with the current text
-   colour. No web font and no HTTP request; the box is a fixed 1em square, so
-   every icon is final at first paint and shifts nothing. Targeted entirely
-   by attribute/element selectors — adding another contact link, project link
-   or certification picks up its icon with no new markup.
-   ========================================================================== */
-
-:root {
-  --ic-mail: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='m3 7 9 6 9-6'/%3E%3C/svg%3E");
-  --ic-github: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E");
-  --ic-linkedin: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z'/%3E%3C/svg%3E");
-  --ic-code: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m8 6-6 6 6 6'/%3E%3Cpath d='m16 6 6 6-6 6'/%3E%3C/svg%3E");
-  --ic-external: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6'/%3E%3Cpath d='M10 14 21 3'/%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3C/svg%3E");
-  --ic-dot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='7' fill='%23000'/%3E%3C/svg%3E");
-  --ic-ring: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3'%3E%3Ccircle cx='12' cy='12' r='6'/%3E%3C/svg%3E");
-  --ic-square: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='5' y='5' width='14' height='14' rx='2' fill='%23000'/%3E%3C/svg%3E");
-}
-
-/* Shared icon box. --icon carries the glyph; colour follows the text. */
-.contact-list .spec a::before,
-.links a::before,
-.section-title::before,
-.cert-status::before {
-  content: "";
-  display: inline-block;
-  inline-size: 1em;
-  block-size: 1em;
-  margin-inline-end: 0.5em;
-  vertical-align: -0.14em;
-  background-color: currentColor;
-  -webkit-mask: var(--icon) center / contain no-repeat;
-  mask: var(--icon) center / contain no-repeat;
-}
-
-/* Contact — matched by href, so no markup hooks are needed. */
-.contact-list .spec a[href^="mailto:"]        { --icon: var(--ic-mail); }
-.contact-list .spec a[href*="github.com"]     { --icon: var(--ic-github); }
-.contact-list .spec a[href*="linkedin.com"]   { --icon: var(--ic-linkedin); }
-
-/* Project links — matched by data-link. */
-.links a[data-link="repo"] { --icon: var(--ic-code); }
-.links a[data-link="live"] { --icon: var(--ic-external); }
-
-/* Section titles — one restrained accent square. */
-.section-title { --icon: var(--ic-square); }
-.section-title::before {
-  inline-size: 0.7em;
-  block-size: 0.7em;
-  vertical-align: 0.04em;
-  background-color: var(--accent);
-}
-
-/* Certification status — a state dot that carries meaning: filled accent for
-   earned, hollow mute for in progress. */
-.cert-status::before { vertical-align: -0.06em; background-color: var(--mute); }
-.cert-status[data-status="earned"]      { --icon: var(--ic-dot); }
-.cert-status[data-status="earned"]::before  { background-color: var(--accent); }
-.cert-status[data-status="in-progress"] { --icon: var(--ic-ring); }
-
-/* Brand logos (Simple Icons, CC0), each in its official flat brand colour.
-   Embedded as background-image data URIs so the SVG keeps its own colour. */
-:root {
-  --logo-supabase: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233ECF8E'%3E%3Cpath d='M11.9 1.036c-.015-.986-1.26-1.41-1.874-.637L.764 12.05C-.33 13.427.65 15.455 2.409 15.455h9.579l.113 7.51c.014.985 1.259 1.408 1.873.636l9.262-11.653c1.093-1.375.113-3.403-1.645-3.403h-9.642z'/%3E%3C/svg%3E");
-  --logo-aws: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF9900'%3E%3Cpath d='M6.763 10.036c0 .296.032.535.088.71.064.176.144.368.256.576.04.063.056.127.056.183 0 .08-.048.16-.152.24l-.503.335a.383.383 0 0 1-.208.072c-.08 0-.16-.04-.239-.112a2.47 2.47 0 0 1-.287-.375 6.18 6.18 0 0 1-.248-.471c-.622.734-1.405 1.101-2.347 1.101-.67 0-1.205-.191-1.596-.574-.391-.384-.59-.894-.59-1.533 0-.678.239-1.23.726-1.644.487-.415 1.133-.623 1.955-.623.272 0 .551.024.846.064.296.04.6.104.918.176v-.583c0-.607-.127-1.03-.375-1.277-.255-.248-.686-.367-1.3-.367-.28 0-.568.031-.863.103-.295.072-.583.16-.862.272a2.287 2.287 0 0 1-.28.104.488.488 0 0 1-.127.023c-.112 0-.168-.08-.168-.247v-.391c0-.128.016-.224.056-.28a.597.597 0 0 1 .224-.167c.279-.144.614-.264 1.005-.36a4.84 4.84 0 0 1 1.246-.151c.95 0 1.644.216 2.091.647.439.43.662 1.085.662 1.963v2.586zm-3.24 1.214c.263 0 .534-.048.822-.144.287-.096.543-.271.758-.51.128-.152.224-.32.272-.512.047-.191.08-.423.08-.694v-.335a6.66 6.66 0 0 0-.735-.136 6.02 6.02 0 0 0-.75-.048c-.535 0-.926.104-1.19.32-.263.215-.39.518-.39.917 0 .375.095.655.295.846.191.2.47.296.838.296zm6.41.862c-.144 0-.24-.024-.304-.08-.064-.048-.12-.16-.168-.311L7.586 5.55a1.398 1.398 0 0 1-.072-.32c0-.128.064-.2.191-.2h.783c.151 0 .255.025.31.08.065.048.113.16.16.312l1.342 5.284 1.245-5.284c.04-.16.088-.264.151-.312a.549.549 0 0 1 .32-.08h.638c.152 0 .256.025.32.08.063.048.12.16.151.312l1.261 5.348 1.381-5.348c.048-.16.104-.264.16-.312a.52.52 0 0 1 .311-.08h.743c.127 0 .2.065.2.2 0 .04-.009.08-.017.128a1.137 1.137 0 0 1-.056.2l-1.923 6.17c-.048.16-.104.263-.168.311a.51.51 0 0 1-.303.08h-.687c-.151 0-.255-.024-.32-.08-.063-.056-.119-.16-.15-.32l-1.238-5.148-1.23 5.14c-.04.16-.087.264-.15.32-.065.056-.177.08-.32.08zm10.256.215c-.415 0-.83-.048-1.229-.143-.399-.096-.71-.2-.918-.32-.128-.071-.215-.151-.247-.223a.563.563 0 0 1-.048-.224v-.407c0-.167.064-.247.183-.247.048 0 .096.008.144.024.048.016.12.048.2.08.271.12.566.215.878.279.319.064.63.096.95.096.502 0 .894-.088 1.165-.264a.86.86 0 0 0 .415-.758.777.777 0 0 0-.215-.559c-.144-.151-.416-.287-.807-.415l-1.157-.36c-.583-.183-1.014-.454-1.277-.813a1.902 1.902 0 0 1-.4-1.158c0-.335.073-.63.216-.886.144-.255.335-.479.575-.654.24-.184.51-.32.83-.415.32-.096.655-.136 1.006-.136.175 0 .359.008.535.032.183.024.35.056.518.088.16.04.312.08.455.127.144.048.256.096.336.144a.69.69 0 0 1 .24.2.43.43 0 0 1 .071.263v.375c0 .168-.064.256-.184.256a.83.83 0 0 1-.303-.096 3.652 3.652 0 0 0-1.532-.311c-.455 0-.815.071-1.062.223-.248.152-.375.383-.375.71 0 .224.08.416.24.567.159.152.454.304.877.44l1.134.358c.574.184.99.44 1.237.767.247.327.367.702.367 1.117 0 .343-.072.655-.207.926-.144.272-.336.511-.583.703-.248.2-.543.343-.886.447-.36.111-.734.167-1.142.167zM21.698 16.207c-2.626 1.94-6.442 2.969-9.722 2.969-4.598 0-8.74-1.7-11.87-4.526-.247-.223-.024-.527.272-.351 3.384 1.963 7.559 3.153 11.877 3.153 2.914 0 6.114-.607 9.06-1.852.439-.2.814.287.383.607zM22.792 14.961c-.336-.43-2.22-.207-3.074-.103-.255.032-.295-.192-.063-.36 1.5-1.053 3.967-.75 4.254-.399.287.36-.08 2.826-1.485 4.007-.215.184-.423.088-.327-.151.32-.79 1.03-2.57.695-2.994z'/%3E%3C/svg%3E");
-  --logo-gha: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232088FF'%3E%3Cpath d='M10.984 13.836a.5.5 0 0 1-.353-.146l-.745-.743a.5.5 0 1 1 .706-.708l.392.391 1.181-1.18a.5.5 0 0 1 .708.707l-1.535 1.533a.504.504 0 0 1-.354.146zm9.353-.147l1.534-1.532a.5.5 0 0 0-.707-.707l-1.181 1.18-.392-.391a.5.5 0 1 0-.706.708l.746.743a.497.497 0 0 0 .706-.001zM4.527 7.452l2.557-1.585A1 1 0 0 0 7.09 4.17L4.533 2.56A1 1 0 0 0 3 3.406v3.196a1.001 1.001 0 0 0 1.527.85zm2.03-2.436L4 6.602V3.406l2.557 1.61zM24 12.5c0 1.93-1.57 3.5-3.5 3.5a3.503 3.503 0 0 1-3.46-3h-2.08a3.503 3.503 0 0 1-3.46 3 3.502 3.502 0 0 1-3.46-3h-.558c-.972 0-1.85-.399-2.482-1.042V17c0 1.654 1.346 3 3 3h.04c.244-1.693 1.7-3 3.46-3 1.93 0 3.5 1.57 3.5 3.5S13.43 24 11.5 24a3.502 3.502 0 0 1-3.46-3H8c-2.206 0-4-1.794-4-4V9.899A5.008 5.008 0 0 1 0 5c0-2.757 2.243-5 5-5s5 2.243 5 5a5.005 5.005 0 0 1-4.952 4.998A2.482 2.482 0 0 0 7.482 12h.558c.244-1.693 1.7-3 3.46-3a3.502 3.502 0 0 1 3.46 3h2.08a3.503 3.503 0 0 1 3.46-3c1.93 0 3.5 1.57 3.5 3.5zm-15 8c0 1.378 1.122 2.5 2.5 2.5s2.5-1.122 2.5-2.5-1.122-2.5-2.5-2.5S9 19.122 9 20.5zM5 9c2.206 0 4-1.794 4-4S7.206 1 5 1 1 2.794 1 5s1.794 4 4 4zm9 3.5c0-1.378-1.122-2.5-2.5-2.5S9 11.122 9 12.5s1.122 2.5 2.5 2.5 2.5-1.122 2.5-2.5zm9 0c0-1.378-1.122-2.5-2.5-2.5S18 11.122 18 12.5s1.122 2.5 2.5 2.5 2.5-1.122 2.5-2.5zm-13 8a.5.5 0 1 0 1 0 .5.5 0 0 0-1 0zm2 0a.5.5 0 1 0 1 0 .5.5 0 0 0-1 0zm12 0c0 1.93-1.57 3.5-3.5 3.5a3.503 3.503 0 0 1-3.46-3.002c-.007.001-.013.005-.021.005l-.506.017h-.017a.5.5 0 0 1-.016-.999l.506-.017c.018-.002.035.006.052.007A3.503 3.503 0 0 1 20.5 17c1.93 0 3.5 1.57 3.5 3.5zm-1 0c0-1.378-1.122-2.5-2.5-2.5S18 19.122 18 20.5s1.122 2.5 2.5 2.5 2.5-1.122 2.5-2.5z'/%3E%3C/svg%3E");
-  --logo-postgres: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234169E1'%3E%3Cpath d='M23.5594 14.7228a.5269.5269 0 0 0-.0563-.1191c-.139-.2632-.4768-.3418-1.0074-.2321-1.6533.3411-2.2935.1312-2.5256-.0191 1.342-2.0482 2.445-4.522 3.0411-6.8297.2714-1.0507.7982-3.5237.1222-4.7316a1.5641 1.5641 0 0 0-.1509-.235C21.6931.9086 19.8007.0248 17.5099.0005c-1.4947-.0158-2.7705.3461-3.1161.4794a9.449 9.449 0 0 0-.5159-.0816 8.044 8.044 0 0 0-1.3114-.1278c-1.1822-.0184-2.2038.2642-3.0498.8406-.8573-.3211-4.7888-1.645-7.2219.0788C.9359 2.1526.3086 3.8733.4302 6.3043c.0409.818.5069 3.334 1.2423 5.7436.4598 1.5065.9387 2.7019 1.4334 3.582.553.9942 1.1259 1.5933 1.7143 1.7895.4474.1491 1.1327.1441 1.8581-.7279.8012-.9635 1.5903-1.8258 1.9446-2.2069.4351.2355.9064.3625 1.39.3772a.0569.0569 0 0 0 .0004.0041 11.0312 11.0312 0 0 0-.2472.3054c-.3389.4302-.4094.5197-1.5002.7443-.3102.064-1.1344.2339-1.1464.8115-.0025.1224.0329.2309.0919.3268.2269.4231.9216.6097 1.015.6331 1.3345.3335 2.5044.092 3.3714-.6787-.017 2.231.0775 4.4174.3454 5.0874.2212.5529.7618 1.9045 2.4692 1.9043.2505 0 .5263-.0291.8296-.0941 1.7819-.3821 2.5557-1.1696 2.855-2.9059.1503-.8707.4016-2.8753.5388-4.1012.0169-.0703.0357-.1207.057-.1362.0007-.0005.0697-.0471.4272.0307a.3673.3673 0 0 0 .0443.0068l.2539.0223.0149.001c.8468.0384 1.9114-.1426 2.5312-.4308.6438-.2988 1.8057-1.0323 1.5951-1.6698zM2.371 11.8765c-.7435-2.4358-1.1779-4.8851-1.2123-5.5719-.1086-2.1714.4171-3.6829 1.5623-4.4927 1.8367-1.2986 4.8398-.5408 6.108-.13-.0032.0032-.0066.0061-.0098.0094-2.0238 2.044-1.9758 5.536-1.9708 5.7495-.0002.0823.0066.1989.0162.3593.0348.5873.0996 1.6804-.0735 2.9184-.1609 1.1504.1937 2.2764.9728 3.0892.0806.0841.1648.1631.2518.2374-.3468.3714-1.1004 1.1926-1.9025 2.1576-.5677.6825-.9597.5517-1.0886.5087-.3919-.1307-.813-.5871-1.2381-1.3223-.4796-.839-.9635-2.0317-1.4155-3.5126zm6.0072 5.0871c-.1711-.0428-.3271-.1132-.4322-.1772.0889-.0394.2374-.0902.4833-.1409 1.2833-.2641 1.4815-.4506 1.9143-1.0002.0992-.126.2116-.2687.3673-.4426a.3549.3549 0 0 0 .0737-.1298c.1708-.1513.2724-.1099.4369-.0417.156.0646.3078.26.3695.4752.0291.1016.0619.2945-.0452.4444-.9043 1.2658-2.2216 1.2494-3.1676 1.0128zm2.094-3.988-.0525.141c-.133.3566-.2567.6881-.3334 1.003-.6674-.0021-1.3168-.2872-1.8105-.8024-.6279-.6551-.9131-1.5664-.7825-2.5004.1828-1.3079.1153-2.4468.079-3.0586-.005-.0857-.0095-.1607-.0122-.2199.2957-.2621 1.6659-.9962 2.6429-.7724.4459.1022.7176.4057.8305.928.5846 2.7038.0774 3.8307-.3302 4.7363-.084.1866-.1633.3629-.2311.5454zm7.3637 4.5725c-.0169.1768-.0358.376-.0618.5959l-.146.4383a.3547.3547 0 0 0-.0182.1077c-.0059.4747-.054.6489-.115.8693-.0634.2292-.1353.4891-.1794 1.0575-.11 1.4143-.8782 2.2267-2.4172 2.5565-1.5155.3251-1.7843-.4968-2.0212-1.2217a6.5824 6.5824 0 0 0-.0769-.2266c-.2154-.5858-.1911-1.4119-.1574-2.5551.0165-.5612-.0249-1.9013-.3302-2.6462.0044-.2932.0106-.5909.019-.8918a.3529.3529 0 0 0-.0153-.1126 1.4927 1.4927 0 0 0-.0439-.208c-.1226-.4283-.4213-.7866-.7797-.9351-.1424-.059-.4038-.1672-.7178-.0869.067-.276.1831-.5875.309-.9249l.0529-.142c.0595-.16.134-.3257.213-.5012.4265-.9476 1.0106-2.2453.3766-5.1772-.2374-1.0981-1.0304-1.6343-2.2324-1.5098-.7207.0746-1.3799.3654-1.7088.5321a5.6716 5.6716 0 0 0-.1958.1041c.0918-1.1064.4386-3.1741 1.7357-4.4823a4.0306 4.0306 0 0 1 .3033-.276.3532.3532 0 0 0 .1447-.0644c.7524-.5706 1.6945-.8506 2.802-.8325.4091.0067.8017.0339 1.1742.081 1.939.3544 3.2439 1.4468 4.0359 2.3827.8143.9623 1.2552 1.9315 1.4312 2.4543-1.3232-.1346-2.2234.1268-2.6797.779-.9926 1.4189.543 4.1729 1.2811 5.4964.1353.2426.2522.4522.2889.5413.2403.5825.5515.9713.7787 1.2552.0696.087.1372.1714.1885.245-.4008.1155-1.1208.3825-1.0552 1.717-.0123.1563-.0423.4469-.0834.8148-.0461.2077-.0702.4603-.0994.7662zm.8905-1.6211c-.0405-.8316.2691-.9185.5967-1.0105a2.8566 2.8566 0 0 0 .135-.0406 1.202 1.202 0 0 0 .1342.103c.5703.3765 1.5823.4213 3.0068.1344-.2016.1769-.5189.3994-.9533.6011-.4098.1903-1.0957.333-1.7473.3636-.7197.0336-1.0859-.0807-1.1721-.151zm.5695-9.2712c-.0059.3508-.0542.6692-.1054 1.0017-.055.3576-.112.7274-.1264 1.1762-.0142.4368.0404.8909.0932 1.3301.1066.887.216 1.8003-.2075 2.7014a3.5272 3.5272 0 0 1-.1876-.3856c-.0527-.1276-.1669-.3326-.3251-.6162-.6156-1.1041-2.0574-3.6896-1.3193-4.7446.3795-.5427 1.3408-.5661 2.1781-.463zm.2284 7.0137a12.3762 12.3762 0 0 0-.0853-.1074l-.0355-.0444c.7262-1.1995.5842-2.3862.4578-3.4385-.0519-.4318-.1009-.8396-.0885-1.2226.0129-.4061.0666-.7543.1185-1.0911.0639-.415.1288-.8443.1109-1.3505.0134-.0531.0188-.1158.0118-.1902-.0457-.4855-.5999-1.938-1.7294-3.253-.6076-.7073-1.4896-1.4972-2.6889-2.0395.5251-.1066 1.2328-.2035 2.0244-.1859 2.0515.0456 3.6746.8135 4.8242 2.2824a.908.908 0 0 1 .0667.1002c.7231 1.3556-.2762 6.2751-2.9867 10.5405zm-8.8166-6.1162c-.025.1794-.3089.4225-.6211.4225a.5821.5821 0 0 1-.0809-.0056c-.1873-.026-.3765-.144-.5059-.3156-.0458-.0605-.1203-.178-.1055-.2844.0055-.0401.0261-.0985.0925-.1488.1182-.0894.3518-.1226.6096-.0867.3163.0441.6426.1938.6113.4186zm7.9305-.4114c.0111.0792-.049.201-.1531.3102-.0683.0717-.212.1961-.4079.2232a.5456.5456 0 0 1-.075.0052c-.2935 0-.5414-.2344-.5607-.3717-.024-.1765.2641-.3106.5611-.352.297-.0414.6111.0088.6356.1851z'/%3E%3C/svg%3E");
-  --logo-scikit: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F7931E'%3E%3Cpath d='M15.601 5.53c-1.91.035-3.981.91-5.63 2.56-2.93 2.93-2.083 8.53-1.088 9.525.805.804 6.595 1.843 9.526-1.088a9.74 9.74 0 0 0 .584-.643c.043-.292.205-.66.489-1.106a1.848 1.848 0 0 1-.537.176c-.144.265-.37.55-.676.855-.354.335-.607.554-.76.656a.795.795 0 0 1-.437.152c-.35 0-.514-.308-.494-.924-.22.316-.425.549-.612.7a.914.914 0 0 1-.578.224c-.194 0-.36-.09-.496-.273a1.03 1.03 0 0 1-.193-.507 4.016 4.016 0 0 1-.726.583c-.224.132-.47.197-.74.197-.3 0-.543-.096-.727-.288a.978.978 0 0 1-.257-.524v.004c-.3.276-.564.48-.79.611a1.295 1.295 0 0 1-.649.197.693.693 0 0 1-.571-.275c-.145-.183-.218-.43-.218-.739 0-.464.101-1.02.302-1.67.201-.65.445-1.25.733-1.797l.842-.312a.21.21 0 0 1 .06-.013c.063 0 .116.047.157.14.04.095.061.221.061.38 0 .451-.104.888-.312 1.31-.207.422-.532.873-.974 1.352-.018.23-.027.388-.027.474 0 .193.036.345.106.458.071.113.165.169.282.169a.71.71 0 0 0 .382-.13c.132-.084.333-.26.602-.523.028-.418.187-.798.482-1.142.324-.38.685-.569 1.08-.569.206 0 .37.054.494.16a.524.524 0 0 1 .186.417c0 .458-.486.829-1.459 1.114.088.43.32.646.693.646a.807.807 0 0 0 .417-.117c.129-.076.321-.243.575-.497.032-.252.118-.495.259-.728.182-.3.416-.544.701-.73.285-.185.537-.278.756-.278.276 0 .47.127.58.381l.677-.374h.186l-.292.971c-.15.488-.226.823-.226 1.004 0 .19.067.285.202.285.086 0 .181-.045.285-.137.104-.092.25-.232.437-.42v.001c.143-.155.274-.32.392-.494-.19-.084-.285-.21-.285-.375 0-.17.058-.352.174-.545.116-.194.275-.29.479-.29.172 0 .258.088.258.265 0 .139-.05.338-.149.596.367-.04.687-.32.961-.842l.228-.01c1.059-2.438.828-5.075-.83-6.732-1.019-1.02-2.408-1.5-3.895-1.471zm4.725 8.203a8.938 8.938 0 0 1-1.333 2.151 1.09 1.09 0 0 0-.012.147c0 .168.047.309.14.423.092.113.206.17.34.17.296 0 .714-.264 1.254-.787-.001.04-.003.08-.003.121 0 .146.012.368.036.666l.733-.172c0-.2.003-.357.01-.474.01-.157.033-.33.066-.517.02-.11.07-.216.152-.315l.186-.216a5.276 5.276 0 0 1 .378-.397c.062-.055.116-.099.162-.13a.26.26 0 0 1 .123-.046c.055 0 .083.035.083.106 0 .07-.052.236-.156.497-.194.486-.292.848-.292 1.084 0 .175.046.314.136.418a.45.45 0 0 0 .358.155c.365 0 .803-.269 1.313-.808v-.381c-.361.426-.623.64-.784.64-.109 0-.163-.067-.163-.2 0-.1.065-.316.195-.65.19-.486.285-.836.285-1.048a.464.464 0 0 0-.112-.319.36.36 0 0 0-.282-.127c-.165 0-.354.077-.567.233-.213.156-.5.436-.863.84.053-.262.165-.622.335-1.08l-.809.156a6.54 6.54 0 0 0-.399 1.074c-.04.156-.07.316-.092.48a7.447 7.447 0 0 1-.49.45.38.38 0 0 1-.229.08.208.208 0 0 1-.174-.082.352.352 0 0 1-.064-.222c0-.1.019-.214.056-.343.038-.13.12-.373.249-.731l.308-.849zm-17.21-2.927c-.863-.016-1.67.263-2.261.854-1.352 1.352-1.07 3.827.631 5.527 1.7 1.701 4.95 1.21 5.527.632.467-.466 1.07-3.827-.631-5.527-.957-.957-2.158-1.465-3.267-1.486zm12.285.358h.166v.21H15.4zm.427 0h.166v.865l.46-.455h.195l-.364.362.428.684h-.198l-.357-.575-.164.166v.41h-.166zm1.016 0h.166v.21h-.166zm.481.122h.166v.288h.172v.135h-.172v.717c0 .037.006.062.02.075.012.013.037.02.074.02a.23.23 0 0 0 .078-.01v.141a.802.802 0 0 1-.136.014.23.23 0 0 1-.15-.043.15.15 0 0 1-.052-.123v-.79h-.141v-.136h.141zm-3.562.258c.081 0 .15.012.207.038.057.024.1.061.13.11s.045.106.045.173h-.176c-.006-.111-.075-.167-.208-.167a.285.285 0 0 0-.164.041.134.134 0 0 0-.06.117c0 .035.015.065.045.088.03.024.08.044.15.06l.16.039a.47.47 0 0 1 .224.105c.047.046.07.108.07.186a.3.3 0 0 1-.052.175.327.327 0 0 1-.152.116.585.585 0 0 1-.226.041c-.136 0-.24-.03-.309-.088-.069-.059-.105-.149-.109-.269h.176c.004.037.01.065.017.084a.166.166 0 0 0 .034.054c.044.043.112.065.204.065a.31.31 0 0 0 .177-.045.139.139 0 0 0 .067-.119.116.116 0 0 0-.038-.09.287.287 0 0 0-.124-.055l-.156-.038a1.248 1.248 0 0 1-.159-.05.359.359 0 0 1-.098-.061.22.22 0 0 1-.058-.083.32.32 0 0 1-.016-.108c0-.096.036-.174.109-.232a.45.45 0 0 1 .29-.087zm1.035 0a.46.46 0 0 1 .202.043.351.351 0 0 1 .187.212.577.577 0 0 1 .023.126h-.168a.256.256 0 0 0-.078-.168.242.242 0 0 0-.17-.06.248.248 0 0 0-.155.05.306.306 0 0 0-.1.144.662.662 0 0 0-.034.224.58.58 0 0 0 .035.214.299.299 0 0 0 .101.135.261.261 0 0 0 .157.048c.142 0 .227-.084.256-.252h.167a.519.519 0 0 1-.065.22.35.35 0 0 1-.146.138.464.464 0 0 1-.216.048.448.448 0 0 1-.246-.066.441.441 0 0 1-.161-.192.703.703 0 0 1-.057-.293c0-.085.01-.163.032-.233a.522.522 0 0 1 .095-.182.403.403 0 0 1 .15-.117.453.453 0 0 1 .191-.04zm.603.03h.166v1.046H15.4zm1.443 0h.166v1.046h-.166zm-5.05.618c-.08 0-.2.204-.356.611-.155.407-.308.977-.459 1.71.281-.312.509-.662.683-1.05.175-.387.262-.72.262-.999a.455.455 0 0 0-.036-.197c-.025-.05-.056-.075-.093-.075zm4.662 1.797c-.221 0-.431.188-.629.563-.197.376-.296.722-.296 1.038 0 .12.029.216.088.29a.273.273 0 0 0 .223.111c.221 0 .43-.188.625-.565.196-.377.294-.725.294-1.043a.457.457 0 0 0-.083-.29.269.269 0 0 0-.222-.104zm-2.848.007c-.146 0-.285.11-.417.333-.133.222-.2.51-.2.866.566-.159.849-.452.849-.881 0-.212-.077-.318-.232-.318Z'/%3E%3C/svg%3E");
-  --logo-pytorch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23EE4C2C'%3E%3Cpath d='M12.005 0L4.952 7.053a9.865 9.865 0 000 14.022 9.866 9.866 0 0014.022 0c3.984-3.9 3.986-10.205.085-14.023l-1.744 1.743c2.904 2.905 2.904 7.634 0 10.538s-7.634 2.904-10.538 0-2.904-7.634 0-10.538l4.647-4.646.582-.665zm3.568 3.899a1.327 1.327 0 00-1.327 1.327 1.327 1.327 0 001.327 1.328A1.327 1.327 0 0016.9 5.226 1.327 1.327 0 0015.573 3.9z'/%3E%3C/svg%3E");
-  --logo-python: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233776AB'%3E%3Cpath d='M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z'/%3E%3C/svg%3E");
-  --logo-js: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F7DF1E'%3E%3Cpath d='M0 0h24v24H0V0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.404-.601-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65l.046.067zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179l.004-.056z'/%3E%3C/svg%3E");
-  --logo-html: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E34F26'%3E%3Cpath d='M1.5 0h21l-1.91 21.563L11.977 24l-8.564-2.438L1.5 0zm7.031 9.75l-.232-2.718 10.059.003.23-2.622L5.412 4.41l.698 8.01h9.126l-.326 3.426-2.91.804-2.955-.81-.188-2.11H6.248l.33 4.171L12 19.351l5.379-1.443.744-8.157H8.531z'/%3E%3C/svg%3E");
-  --logo-css: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231572B6'%3E%3Cpath d='M1.5 0h21l-1.91 21.563L11.977 24l-8.565-2.438L1.5 0zm17.09 4.413L5.41 4.41l.213 2.622 10.125.002-.255 2.716h-6.64l.24 2.573h6.182l-.366 3.523-2.91.804-2.956-.81-.188-2.11h-2.61l.29 3.855L12 19.288l5.373-1.53L18.59 4.414z'/%3E%3C/svg%3E");
-  --logo-react: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2361DAFB'%3E%3Cpath d='M14.23 12.004a2.236 2.236 0 0 1-2.235 2.236 2.236 2.236 0 0 1-2.236-2.236 2.236 2.236 0 0 1 2.235-2.236 2.236 2.236 0 0 1 2.236 2.236zm2.648-10.69c-1.346 0-3.107.96-4.888 2.622-1.78-1.653-3.542-2.602-4.887-2.602-.41 0-.783.093-1.106.278-1.375.793-1.683 3.264-.973 6.365C1.98 8.917 0 10.42 0 12.004c0 1.59 1.99 3.097 5.043 4.03-.704 3.113-.39 5.588.988 6.38.32.187.69.275 1.102.275 1.345 0 3.107-.96 4.888-2.624 1.78 1.654 3.542 2.603 4.887 2.603.41 0 .783-.09 1.106-.275 1.374-.792 1.683-3.263.973-6.365C22.02 15.096 24 13.59 24 12.004c0-1.59-1.99-3.097-5.043-4.032.704-3.11.39-5.587-.988-6.38-.318-.184-.688-.277-1.092-.278zm-.005 1.09v.006c.225 0 .406.044.558.127.666.382.955 1.835.73 3.704-.054.46-.142.945-.25 1.44-.96-.236-2.006-.417-3.107-.534-.66-.905-1.345-1.727-2.035-2.447 1.592-1.48 3.087-2.292 4.105-2.295zm-9.77.02c1.012 0 2.514.808 4.11 2.28-.686.72-1.37 1.537-2.02 2.442-1.107.117-2.154.298-3.113.538-.112-.49-.195-.964-.254-1.42-.23-1.868.054-3.32.714-3.707.19-.09.4-.127.563-.132zm4.882 3.05c.455.468.91.992 1.36 1.564-.44-.02-.89-.034-1.345-.034-.46 0-.915.01-1.36.034.44-.572.895-1.096 1.345-1.565zM12 8.1c.74 0 1.477.034 2.202.093.406.582.802 1.203 1.183 1.86.372.64.71 1.29 1.018 1.946-.308.655-.646 1.31-1.013 1.95-.38.66-.773 1.288-1.18 1.87-.728.063-1.466.098-2.21.098-.74 0-1.477-.035-2.202-.093-.406-.582-.802-1.204-1.183-1.86-.372-.64-.71-1.29-1.018-1.946.303-.657.646-1.313 1.013-1.954.38-.66.773-1.286 1.18-1.868.728-.064 1.466-.098 2.21-.098zm-3.635.254c-.24.377-.48.763-.704 1.16-.225.39-.435.782-.635 1.174-.265-.656-.49-1.31-.676-1.947.64-.15 1.315-.283 2.015-.386zm7.26 0c.695.103 1.365.23 2.006.387-.18.632-.405 1.282-.66 1.933-.2-.39-.41-.783-.64-1.174-.225-.392-.465-.774-.705-1.146zm3.063.675c.484.15.944.317 1.375.498 1.732.74 2.852 1.708 2.852 2.476-.005.768-1.125 1.74-2.857 2.475-.42.18-.88.342-1.355.493-.28-.958-.646-1.956-1.1-2.98.45-1.017.81-2.01 1.085-2.964zm-13.395.004c.278.96.645 1.957 1.1 2.98-.45 1.017-.812 2.01-1.086 2.964-.484-.15-.944-.318-1.37-.5-1.732-.737-2.852-1.706-2.852-2.474 0-.768 1.12-1.742 2.852-2.476.42-.18.88-.342 1.356-.494zm11.678 4.28c.265.657.49 1.312.676 1.948-.64.157-1.316.29-2.016.39.24-.375.48-.762.705-1.158.225-.39.435-.788.636-1.18zm-9.945.02c.2.392.41.783.64 1.175.23.39.465.772.705 1.143-.695-.102-1.365-.23-2.006-.386.18-.63.406-1.282.66-1.933zM17.92 16.32c.112.493.2.968.254 1.423.23 1.868-.054 3.32-.714 3.708-.147.09-.338.128-.563.128-1.012 0-2.514-.807-4.11-2.28.686-.72 1.37-1.536 2.02-2.44 1.107-.118 2.154-.3 3.113-.54zm-11.83.01c.96.234 2.006.415 3.107.532.66.905 1.345 1.727 2.035 2.446-1.595 1.483-3.092 2.295-4.11 2.295-.22-.005-.406-.05-.553-.132-.666-.38-.955-1.834-.73-3.703.054-.46.142-.944.25-1.438zm4.56.64c.44.02.89.034 1.345.034.46 0 .915-.01 1.36-.034-.44.572-.895 1.095-1.345 1.565-.455-.47-.91-.993-1.36-1.565z'/%3E%3C/svg%3E");
-  --logo-git: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F05033'%3E%3Cpath d='M13.09 23.549a1.54 1.54 0 0 1-2.18 0L.451 13.089a1.54 1.54 0 0 1 0-2.179l7.191-7.19 2.733 2.733a1.85 1.85 0 0 0 .964 2.326v6.66a1.849 1.849 0 1 0 1.54 0V8.957l2.508 2.508a1.85 1.85 0 1 0 1.09-1.09l-2.634-2.634a1.85 1.85 0 0 0-2.378-2.377L8.73 2.63 10.91.451a1.54 1.54 0 0 1 2.179 0l10.459 10.46a1.54 1.54 0 0 1 0 2.179z'/%3E%3C/svg%3E");
-  --logo-cisco: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231BA0D7'%3E%3Cpath d='M16.331 18.171V17.06l-.022.01c-.25.121-.522.19-.801.203a1.186 1.186 0 01-.806-.237 1.038 1.038 0 01-.352-.498 1.21 1.21 0 01-.023-.667c.052-.225.178-.426.357-.569.16-.134.355-.218.562-.242a1.85 1.85 0 011.061.198l.024.013v-1.117l-.051-.014a2.862 2.862 0 00-1.011-.132 2.34 2.34 0 00-.903.206c-.287.132-.54.327-.739.571a2.221 2.221 0 00-.04 2.705c.295.378.709.645 1.175.756.491.12 1.006.102 1.487-.052l.082-.023M5.336 18.171V17.06l-.022.01c-.25.121-.522.19-.801.203a1.183 1.183 0 01-.806-.237 1.03 1.03 0 01-.351-.498 1.202 1.202 0 01-.024-.667c.052-.225.177-.426.357-.569.16-.134.355-.218.562-.242a1.85 1.85 0 011.061.198l.024.013v-1.117l-.051-.014a2.862 2.862 0 00-1.011-.132 2.344 2.344 0 00-.903.206 2.08 2.08 0 00-.74.571 2.224 2.224 0 00-.041 2.705 2.11 2.11 0 001.176.756c.491.12 1.005.102 1.487-.052l.083-.023M9.26 17.249l-.004.957.07.012c.22.041.441.069.664.085.195.019.391.022.587.012.187-.014.372-.049.551-.104.21-.06.405-.163.571-.305a1.16 1.16 0 00.333-.478 1.31 1.31 0 00-.007-.96 1.068 1.068 0 00-.298-.414 1.261 1.261 0 00-.438-.255l-.722-.268a.388.388 0 01-.197-.188.245.245 0 01.008-.219.382.382 0 01.154-.142.798.798 0 01.257-.074c.153-.022.308-.021.46.005.18.02.358.051.533.096l.038.008v-.883l-.069-.015a4.749 4.749 0 00-.543-.097 2.844 2.844 0 00-.714-.003c-.3.027-.585.143-.821.33-.16.126-.281.293-.351.484-.104.29-.105.608 0 .899.054.145.14.274.252.381.097.093.207.173.327.236.157.084.324.149.497.195.057.017.114.035.17.054l.085.031.024.01c.084.03.162.078.226.14.045.042.08.094.101.151a.325.325 0 01.001.161.339.339 0 01-.166.198.856.856 0 01-.275.086 2.032 2.032 0 01-.427.021 5.208 5.208 0 01-.557-.074 9.195 9.195 0 01-.287-.067l-.033-.006zm-2.475.995h1.05v-4.167h-1.05v4.167zm12.162-2.936a1.095 1.095 0 011.541.158 1.094 1.094 0 01-.157 1.541l-.017.014a1.096 1.096 0 01-1.367-1.713m-1.525.854a2.193 2.193 0 002.666 2.107 2.139 2.139 0 00.701-3.937 2.207 2.207 0 00-3.367 1.83M22.961 10.728a.52.52 0 001.039 0V9.573a.52.52 0 00-1.039 0v1.155M20.117 10.728a.522.522 0 001.041 0V8.139a.521.521 0 00-1.04 0v2.589M17.231 11.771a.521.521 0 001.039 0V6.17a.52.52 0 00-1.039 0v5.601M14.393 10.728a.521.521 0 001.04 0V8.139a.52.52 0 00-1.039 0v2.589M11.494 10.728a.522.522 0 001.039 0V9.573a.52.52 0 00-1.039 0v1.155M8.624 10.728a.52.52 0 001.039 0V8.139a.52.52 0 00-1.039 0v2.589M5.737 11.771a.52.52 0 001.039 0V6.17a.52.52 0 00-1.039 0v5.601M2.876 10.728a.522.522 0 001.04 0V8.139a.52.52 0 00-1.039 0v2.589M0 10.728a.521.521 0 001.039 0V9.573a.52.52 0 00-1.039 0v1.155'/%3E%3C/svg%3E");
-  --logo-linux: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FCC624'%3E%3Cpath d='M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139zm.529 3.405h.013c.213 0 .396.062.584.198.19.135.33.332.438.533.105.259.158.459.166.724 0-.02.006-.04.006-.06v.105a.086.086 0 01-.004-.021l-.004-.024a1.807 1.807 0 01-.15.706.953.953 0 01-.213.335.71.71 0 00-.088-.042c-.104-.045-.198-.064-.284-.133a1.312 1.312 0 00-.22-.066c.05-.06.146-.133.183-.198.053-.128.082-.264.088-.402v-.02a1.21 1.21 0 00-.061-.4c-.045-.134-.101-.2-.183-.333-.084-.066-.167-.132-.267-.132h-.016c-.093 0-.176.03-.262.132a.8.8 0 00-.205.334 1.18 1.18 0 00-.09.4v.019c.002.089.008.179.02.267-.193-.067-.438-.135-.607-.202a1.635 1.635 0 01-.018-.2v-.02a1.772 1.772 0 01.15-.768c.082-.22.232-.406.43-.533a.985.985 0 01.594-.2zm-2.962.059h.036c.142 0 .27.048.399.135.146.129.264.288.344.465.09.199.14.4.153.667v.004c.007.134.006.2-.002.266v.08c-.03.007-.056.018-.083.024-.152.055-.274.135-.393.2.012-.09.013-.18.003-.267v-.015c-.012-.133-.04-.2-.082-.333a.613.613 0 00-.166-.267.248.248 0 00-.183-.064h-.021c-.071.006-.13.04-.186.132a.552.552 0 00-.12.27.944.944 0 00-.023.33v.015c.012.135.037.2.08.334.046.134.098.2.166.268.01.009.02.018.034.024-.07.057-.117.07-.176.136a.304.304 0 01-.131.068 2.62 2.62 0 01-.275-.402 1.772 1.772 0 01-.155-.667 1.759 1.759 0 01.08-.668 1.43 1.43 0 01.283-.535c.128-.133.26-.2.418-.2zm1.37 1.706c.332 0 .733.065 1.216.399.293.2.523.269 1.052.468h.003c.255.136.405.266.478.399v-.131a.571.571 0 01.016.47c-.123.31-.516.643-1.063.842v.002c-.268.135-.501.333-.775.465-.276.135-.588.292-1.012.267a1.139 1.139 0 01-.448-.067 3.566 3.566 0 01-.322-.198c-.195-.135-.363-.332-.612-.465v-.005h-.005c-.4-.246-.616-.512-.686-.71-.07-.268-.005-.47.193-.6.224-.135.38-.271.483-.336.104-.074.143-.102.176-.131h.002v-.003c.169-.202.436-.47.839-.601.139-.036.294-.065.466-.065zm2.8 2.142c.358 1.417 1.196 3.475 1.735 4.473.286.534.855 1.659 1.102 3.024.156-.005.33.018.513.064.646-1.671-.546-3.467-1.089-3.966-.22-.2-.232-.335-.123-.335.59.534 1.365 1.572 1.646 2.757.13.535.16 1.104.021 1.67.067.028.135.06.205.067 1.032.534 1.413.938 1.23 1.537v-.043c-.06-.003-.12 0-.18 0h-.016c.151-.467-.182-.825-1.065-1.224-.915-.4-1.646-.336-1.77.465-.008.043-.013.066-.018.135-.068.023-.139.053-.209.064-.43.268-.662.669-.793 1.187-.13.533-.17 1.156-.205 1.869v.003c-.02.334-.17.838-.319 1.35-1.5 1.072-3.58 1.538-5.348.334a2.645 2.645 0 00-.402-.533 1.45 1.45 0 00-.275-.333c.182 0 .338-.03.465-.067a.615.615 0 00.314-.334c.108-.267 0-.697-.345-1.163-.345-.467-.931-.995-1.788-1.521-.63-.4-.986-.87-1.15-1.396-.165-.534-.143-1.085-.015-1.645.245-1.07.873-2.11 1.274-2.763.107-.065.037.135-.408.974-.396.751-1.14 2.497-.122 3.854a8.123 8.123 0 01.647-2.876c.564-1.278 1.743-3.504 1.836-5.268.048.036.217.135.289.202.218.133.38.333.59.465.21.201.477.335.876.335.039.003.075.006.11.006.412 0 .73-.134.997-.268.29-.134.52-.334.74-.4h.005c.467-.135.835-.402 1.044-.7zm2.185 8.958c.037.6.343 1.245.882 1.377.588.134 1.434-.333 1.791-.765l.211-.01c.315-.007.577.01.847.268l.003.003c.208.199.305.53.391.876.085.4.154.78.409 1.066.486.527.645.906.636 1.14l.003-.007v.018l-.003-.012c-.015.262-.185.396-.498.595-.63.401-1.746.712-2.457 1.57-.618.737-1.37 1.14-2.036 1.191-.664.053-1.237-.2-1.574-.898l-.005-.003c-.21-.4-.12-1.025.056-1.69.176-.668.428-1.344.463-1.897.037-.714.076-1.335.195-1.814.12-.465.308-.797.641-.984l.045-.022zm-10.814.049h.01c.053 0 .105.005.157.014.376.055.706.333 1.023.752l.91 1.664.003.003c.243.533.754 1.064 1.189 1.637.434.598.77 1.131.729 1.57v.006c-.057.744-.48 1.148-1.125 1.294-.645.135-1.52.002-2.395-.464-.968-.536-2.118-.469-2.857-.602-.369-.066-.61-.2-.723-.4-.11-.2-.113-.602.123-1.23v-.004l.002-.003c.117-.334.03-.752-.027-1.118-.055-.401-.083-.71.043-.94.16-.334.396-.4.69-.533.294-.135.64-.202.915-.47h.002v-.002c.256-.268.445-.601.668-.838.19-.201.38-.336.663-.336zm7.159-9.074c-.435.201-.945.535-1.488.535-.542 0-.97-.267-1.28-.466-.154-.134-.28-.268-.373-.335-.164-.134-.144-.333-.074-.333.109.016.129.134.199.2.096.066.215.2.36.333.292.2.68.467 1.167.467.485 0 1.053-.267 1.398-.466.195-.135.445-.334.648-.467.156-.136.149-.267.279-.267.128.016.034.134-.147.332a8.097 8.097 0 01-.69.468zm-1.082-1.583V5.64c-.006-.02.013-.042.029-.05.074-.043.18-.027.26.004.063 0 .16.067.15.135-.006.049-.085.066-.135.066-.055 0-.092-.043-.141-.068-.052-.018-.146-.008-.163-.065zm-.551 0c-.02.058-.113.049-.166.066-.047.025-.086.068-.14.068-.05 0-.13-.02-.136-.068-.01-.066.088-.133.15-.133.08-.031.184-.047.259-.005.019.009.036.03.03.05v.02h.003z'/%3E%3C/svg%3E");
-  --logo-vercel-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='m12 1.608 12 20.784H0Z'/%3E%3C/svg%3E");
-  --logo-github-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E");
+.colophon {
+  margin-block-start: 3rem;
+  padding-block-start: 1.75rem;
+  max-inline-size: 42rem;
+  border-block-start: 1px solid var(--pine-line);
+  color: var(--on-pine-2);
+  font-size: 0.8125rem;
+  line-height: 1.6;
 }
 
 /* ==========================================================================
-   Brand logos on stack tags and certification badges
-   Coloured logos are painted as background-image (SVG keeps its own colour);
-   Vercel is a black/white mark, so it uses a mask and follows the text colour
-   to stay visible in both themes. Each glyph is a fixed-size box → no CLS.
-   Attribute-driven (data-tech / data-cert): new tags or certs opt in with no
-   new CSS. Tags without a logo simply stay text-only.
+   MOTION
+   Everything below is gated on html[data-motion="on"], which motion.js only
+   sets when prefers-reduced-motion is not "reduce". No script, a failed
+   script or reduced motion all land on the same result: the resting state,
+   fully visible. Only opacity and transform are ever animated.
    ========================================================================== */
 
-.tags li[data-tech]::before {
-  content: "";
-  display: inline-block;
-  inline-size: 1.05em;
-  block-size: 1.05em;
-  margin-inline-end: 0.45em;
-  vertical-align: -0.16em;
-  background: var(--logo) center / contain no-repeat;
+/* -- micro-interactions: hover and focus ---------------------------------- */
+
+html[data-motion="on"] .nav-list a,
+html[data-motion="on"] .nav-list a::after,
+html[data-motion="on"] .btn,
+html[data-motion="on"] .btn--quiet,
+html[data-motion="on"] .filters button,
+html[data-motion="on"] .card-links a,
+html[data-motion="on"] .contact-links a {
+  transition: color var(--dur-micro) var(--ease),
+              background-color var(--dur-micro) var(--ease),
+              border-color var(--dur-micro) var(--ease),
+              box-shadow var(--dur-micro) var(--ease),
+              transform var(--dur-micro) var(--ease);
 }
 
-.tags li[data-tech="supabase"] { --logo: var(--logo-supabase); }
-.tags li[data-tech="aws"]      { --logo: var(--logo-aws); }
-.tags li[data-tech="gha"]      { --logo: var(--logo-gha); }
-.tags li[data-tech="postgres"] { --logo: var(--logo-postgres); }
-.tags li[data-tech="scikit"]   { --logo: var(--logo-scikit); }
-.tags li[data-tech="pytorch"]  { --logo: var(--logo-pytorch); }
-.tags li[data-tech="python"]   { --logo: var(--logo-python); }
-.tags li[data-tech="js"]       { --logo: var(--logo-js); }
-.tags li[data-tech="html"]     { --logo: var(--logo-html); }
-.tags li[data-tech="css"]      { --logo: var(--logo-css); }
-.tags li[data-tech="react"]    { --logo: var(--logo-react); }
-.tags li[data-tech="git"]      { --logo: var(--logo-git); }
-
-/* Vercel: monochrome mark, painted via mask so it flips with the theme. */
-.tags li[data-tech="vercel"]::before {
-  background: var(--ink);
-  -webkit-mask: var(--logo-vercel-mask) center / contain no-repeat;
-  mask: var(--logo-vercel-mask) center / contain no-repeat;
+/* Cards lift, and the numeral edges across as they do. */
+html[data-motion="on"] .projects > li .card,
+html[data-motion="on"] .card-num,
+html[data-motion="on"] .portrait img {
+  transition: transform var(--dur-micro) var(--ease),
+              border-color var(--dur-micro) var(--ease);
 }
 
-/* Certification badges drop into the gutter each .cert already reserves, so
-   they add colour with zero layout shift. */
-.cert[data-cert]::before {
-  content: "";
-  position: absolute;
-  inset-block-start: clamp(1.1rem, 3vw, 1.5rem);
-  inset-inline-start: clamp(1.1rem, 3vw, 1.5rem);
-  inline-size: var(--badge);
-  block-size: var(--badge);
-  background: var(--logo) center / contain no-repeat;
+html[data-motion="on"] .projects > li:hover .card,
+html[data-motion="on"] .projects > li:focus-within .card {
+  transform: translateY(calc(var(--lift) * -1));
+  border-block-start-color: var(--gold);
 }
 
-.cert[data-cert="cisco"] { --logo: var(--logo-cisco); }
-.cert[data-cert="linux"] { --logo: var(--logo-linux); }
-.cert[data-cert="aws"]   { --logo: var(--logo-aws); }
+html[data-motion="on"] .projects > li:hover .card-num,
+html[data-motion="on"] .projects > li:focus-within .card-num {
+  transform: translateX(3px);
+}
 
-/* GitHub: monochrome mark, masked like Vercel so it flips with the theme. */
-.cert[data-cert="github"]::before {
-  background: var(--ink);
-  -webkit-mask: var(--logo-github-mask) center / contain no-repeat;
-  mask: var(--logo-github-mask) center / contain no-repeat;
+/* The portrait scales inside its fixed frame — the frame clips, so nothing
+   around it can move. */
+html[data-motion="on"] .portrait:hover img,
+html[data-motion="on"] .portrait:focus-within img {
+  transform: scale(1.03);
+}
+
+/* -- hero entrance: one staggered fade-up in reading order ----------------- */
+
+html[data-motion="on"] [data-hero] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+html[data-motion="on"] body.is-loaded [data-hero] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity   var(--dur-entrance) var(--ease) calc(var(--i, 0) * var(--stagger)),
+    transform var(--dur-entrance) var(--ease) calc(var(--i, 0) * var(--stagger));
+}
+
+/* The hairlines draw in from their centre, a beat behind their own row. */
+html[data-motion="on"] [data-rule] { transform: scaleX(0); }
+
+html[data-motion="on"] body.is-loaded [data-rule] {
+  transform: scaleX(1);
+  transition: transform var(--dur-rule) var(--ease)
+              calc(var(--i, 0) * var(--stagger) + 120ms);
+}
+
+/* The gold diamond is the last beat. */
+html[data-motion="on"] [data-gem] {
+  opacity: 0;
+  transform: rotate(45deg) scale(0.4);
+}
+
+html[data-motion="on"] body.is-loaded [data-gem] {
+  opacity: 1;
+  transform: rotate(45deg) scale(1);
+  transition: opacity var(--dur-entrance) var(--ease) var(--gem-delay),
+              transform var(--dur-entrance) var(--ease) var(--gem-delay);
+}
+
+/* The crest plants itself once, on load. */
+@keyframes plant {
+  0%   { transform: rotate(-14deg) translateY(-2px); }
+  60%  { transform: rotate(3deg); }
+  100% { transform: rotate(0); }
+}
+
+html[data-motion="on"] body.is-loaded [data-crest] svg {
+  animation: plant var(--dur-rule) var(--ease) 180ms both;
+}
+
+/* -- contours: a barely-perceptible drift --------------------------------- */
+
+@keyframes drift {
+  from { transform: translate3d(-5px, -3px, 0); }
+  to   { transform: translate3d(5px, 3px, 0); }
+}
+
+/* Two layers: the wrapper takes the scroll parallax that motion.js writes
+   into --parallax, the inner svg takes the endless drift. They never fight. */
+html[data-motion="on"] [data-contours] {
+  transform: translate3d(0, var(--parallax, 0px), 0);
+}
+
+html[data-motion="on"] [data-contours] svg {
+  animation: drift var(--drift) ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* -- scroll reveals -------------------------------------------------------- */
+/* One observer, one class. Each target fires once and is then released. */
+
+html[data-motion="on"] [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity var(--dur-reveal) var(--ease),
+              transform var(--dur-reveal) var(--ease);
+}
+
+html[data-motion="on"] [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* -- project cards: one state machine for both the reveal and the filter ---
+   The <li> owns opacity and translate; the .card inside owns the hover lift.
+   Keeping them on separate elements means the two transitions never have to
+   out-specify each other, so each keeps its own duration.                   */
+
+html[data-motion="on"] .projects > li {
+  transition: opacity var(--dur-card) var(--ease),
+              transform var(--dur-card) var(--ease);
+}
+
+html[data-motion="on"] .projects:not(.is-in) > li {
+  opacity: 0;
+  transform: translateY(14px) scale(0.985);
+}
+
+/* The count ticks over rather than snapping. */
+html[data-motion="on"] .count-n {
+  transition: opacity var(--dur-micro) var(--ease),
+              transform var(--dur-micro) var(--ease);
+}
+
+html[data-motion="on"] .count-n.is-ticking {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+/* ==========================================================================
+   Reduced motion — belt and braces. motion.js already declines to set the
+   flag, so none of the rules above match; this also catches the smooth
+   scroll and anything a browser animates on its own.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .skip { transition: none; }
 }
