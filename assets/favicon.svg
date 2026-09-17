@@ -1,10 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Afif">
   <title>Afif</title>
-  <!-- The site's own flag-pin crest, redrawn for a 16px tab: the thin
-       hairline pole and the ground ellipse both disappear at that size, so
-       the pole is thickened and the pennant enlarged, and the mark sits on
-       pine so it holds its shape against a light or a dark tab strip. -->
+  <!-- The site's monogram: an "A" inside a gold ring, the same mark as the
+       nav and the footer stamp, redrawn for a tab.
+
+       Two things change at this size and only these two. The strokes are
+       thickened past a straight scale of the 24-unit original, because a
+       hairline that reads at 26px disappears at 16px; and the mark is set on
+       a pine tile so it holds its shape against a light or a dark tab strip
+       instead of dissolving into whichever one it lands on. The letter goes
+       cream for the same reason it does in the footer — it is on pine now.
+       The gold ring is still the one and only gold accent. -->
   <rect width="64" height="64" rx="14" fill="#22453A"/>
-  <rect x="20.5" y="12" width="4" height="40" rx="2" fill="#B08A46"/>
-  <path d="M24.5 14 L46 21.75 L24.5 29.5 Z" fill="#B08A46"/>
+  <circle cx="32" cy="32" r="21" fill="none" stroke="#B08A46" stroke-width="2.6"/>
+  <path d="M21.1 43.9 L32 20.1 L42.9 43.9 M25.7 34.8 H38.3"
+        fill="none" stroke="#F4EFE6" stroke-width="3.4"
+        stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

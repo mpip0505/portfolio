@@ -8,10 +8,13 @@
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4EFE6">
 
-<!-- Tab icon: the flag-pin crest. The SVG is what modern browsers use and
-     the only one that stays crisp at any size; favicon.ico carries 16/32/48
-     bitmaps for older browsers and for the bare /favicon.ico request a
-     browser makes whether or not it is declared. -->
+<!-- Tab icon: the "A" monogram, the same mark as the nav and the footer.
+     The SVG is what modern browsers use and the only one that stays crisp at
+     any size; favicon.ico carries 16/32/48 bitmaps for older browsers and for
+     the bare /favicon.ico request a browser makes whether or not it is
+     declared — its 16px bitmap is drawn with heavier strokes, because the
+     weights that read at 26px grey out at 16. All three are generated from
+     assets/favicon.svg; regenerate them together if the mark ever changes. -->
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -30,6 +33,37 @@
 <a class="skip" href="#main">Skip to main content</a>
 
 <!-- ======================================================================
+     Duotone filter. Referenced from styles.css by `.duotone { filter:
+     url(#duotone) }`, and it lives here rather than in the stylesheet
+     because an SVG filter has to be a real element in the document.
+
+     Two passes. The first flattens the image to luminance with the Rec.709
+     weights, so what survives is tone alone. The second re-colours that
+     tone through a two-stop table per channel: 0 (black) lands on --pine
+     #22453A, 1 (white) on --cream #F4EFE6, and every value between is
+     interpolated. To retune it, change those six numbers — they are the two
+     palette colours with their channels divided by 255, nothing else.
+
+     color-interpolation-filters="sRGB" is not optional: filters otherwise
+     operate in linearRGB, which lifts the midtones and washes the mapping
+     out. The svg itself is inert — zero-size, hidden and aria-hidden, so it
+     takes no space, reserves no box and never enters the reading order.
+     ====================================================================== -->
+<svg class="svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <filter id="duotone" color-interpolation-filters="sRGB">
+    <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0
+                                         0.2126 0.7152 0.0722 0 0
+                                         0.2126 0.7152 0.0722 0 0
+                                         0      0      0      1 0"/>
+    <feComponentTransfer>
+      <feFuncR type="table" tableValues="0.133 0.957"/>
+      <feFuncG type="table" tableValues="0.271 0.937"/>
+      <feFuncB type="table" tableValues="0.227 0.902"/>
+    </feComponentTransfer>
+  </filter>
+</svg>
+
+<!-- ======================================================================
      Header — centred masthead. Nav splits evenly around the gold crest.
      ====================================================================== -->
 <header class="masthead">
@@ -39,11 +73,16 @@
       <li><a href="#certifications">Certifications</a></li>
     </ul>
 
+    <!-- The monogram. One emblem, three places: here, the footer stamp, and
+         the icon files in assets/. The ring is the single gold accent — the
+         only gold in the nav — and the A is drawn, not set, so it survives a
+         16px favicon where a serif A would break up. Geometry lives here;
+         both colours are the stylesheet's, so the mark retunes with the
+         palette like everything else. -->
     <span class="crest" data-crest aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" focusable="false">
-        <path d="M7.5 21.2V3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
-        <path d="M7.5 3.2 18 6.6 7.5 10.1Z" fill="currentColor"/>
-        <ellipse cx="7.5" cy="21.4" rx="3.6" ry="1.1" fill="currentColor" opacity=".55"/>
+      <svg viewBox="0 0 24 24" width="26" height="26" focusable="false">
+        <circle class="crest-ring" cx="12" cy="12" r="10.4"/>
+        <path class="crest-letter" d="M6.6 17.9 L12 6.1 L17.4 17.9 M8.9 13.4 H15.1"/>
       </svg>
     </span>
 
@@ -133,7 +172,8 @@
                TODO: to swap the photo, replace the file in place; if the
                replacement is not 640x853, update width/height below to match
                so the reserved box still prevents layout shift. -->
-          <img src="assets/portrait.jpg" width="640" height="853" decoding="async"
+          <img class="duotone" src="assets/portrait.jpg" width="640" height="853"
+            decoding="async"
             alt="Muhaimin Afif at the National Deep Tech Challenge, University of Malaya.">
         </span>
         <span class="portrait-pin" aria-hidden="true">
@@ -426,11 +466,13 @@
      7 · Contact / footer — one pine block.
      ====================================================================== -->
 <footer id="contact" class="contact">
+  <!-- The same mark as the nav, one step smaller. Only the letter changes
+       colour — to cream, because it sits on pine here. The gold ring is
+       untouched, so it is still exactly one gold accent. -->
   <span class="crest crest--footer" aria-hidden="true">
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" focusable="false">
-      <path d="M7.5 21.2V3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
-      <path d="M7.5 3.2 18 6.6 7.5 10.1Z" fill="currentColor"/>
-      <ellipse cx="7.5" cy="21.4" rx="3.6" ry="1.1" fill="currentColor" opacity=".55"/>
+    <svg viewBox="0 0 24 24" width="24" height="24" focusable="false">
+      <circle class="crest-ring" cx="12" cy="12" r="10.4"/>
+      <path class="crest-letter" d="M6.6 17.9 L12 6.1 L17.4 17.9 M8.9 13.4 H15.1"/>
     </svg>
   </span>
 

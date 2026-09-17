@@ -1,6 +1,6 @@
 /* ==========================================================================
    motion.js — hero entrance, scroll reveals, pointer tilt and parallax,
-   project filter. No dependencies, no build step.
+   project filter, active-section nav. No dependencies, no build step.
 
    Loaded from <head> without defer, on purpose: it has to set the
    data-motion flag before the first paint, otherwise the page renders its
@@ -14,6 +14,10 @@
      - coarse pointer          -> tilt and pointer parallax are never bound
    In all four cases the page is fully visible and fully readable, and the
    filter still works — it just switches instantly instead of cross-fading.
+
+   One thing here is not motion and is not gated on it: the active-section
+   nav highlight (8). It is an orientation cue, so it runs for everyone who
+   has IntersectionObserver, reduced motion or not.
 
    The 3D is a collaboration, and the split is strict: the stylesheet owns
    the shape of every transform and every cap, this file owns nothing but
@@ -477,6 +481,74 @@
         pBox = null;
         lift({ rx: 0, ry: 0 });
       });
+    }
+
+    /* ----------------------------------------------------------------------
+       8 · Active-section nav highlight.
+
+       Not motion: this is orientation, so it is deliberately NOT gated on
+       MOTION. It runs wherever IntersectionObserver exists, and where it
+       does not, the nav is simply a nav — nothing is broken and nothing is
+       missing but the underline.
+
+       One observer, one attribute. The rootMargin narrows the viewport to a
+       band running from 40% to 80% of its height; a section is a candidate
+       while it overlaps that band, and the topmost candidate wins. The
+       effect of the two together is that the incoming section takes over
+       once the outgoing one has climbed past the 40% line — late enough
+       that the underline never flickers between two links at a boundary,
+       early enough that it names what you are actually reading.
+
+       The observer only reports changes, so it keeps its own record of who
+       is in the band and re-reads the tops on each callback; getBoundingClientRect
+       is called at most once per observed section per crossing, never per scroll.
+       ---------------------------------------------------------------------- */
+
+    var navLinks = document.querySelectorAll('.nav-list a[href^="#"]');
+
+    if (hasIO && navLinks.length) {
+      var watched = [];      /* the sections a nav link actually points at */
+      var inBand  = {};      /* id -> currently overlapping the band       */
+
+      Array.prototype.forEach.call(navLinks, function (link) {
+        var id = link.getAttribute('href').slice(1);
+        var section = document.getElementById(id);
+        if (section && watched.indexOf(section) === -1) watched.push(section);
+      });
+
+      var markCurrent = function (id) {
+        Array.prototype.forEach.call(navLinks, function (link) {
+          if (link.getAttribute('href') === '#' + id) {
+            link.setAttribute('aria-current', 'true');
+          } else {
+            link.removeAttribute('aria-current');
+          }
+        });
+      };
+
+      if (watched.length) {
+        var navObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            inBand[entry.target.id] = entry.isIntersecting;
+          });
+
+          var winner = null;
+          var highest = Infinity;
+
+          watched.forEach(function (section) {
+            if (!inBand[section.id]) return;
+            var top = section.getBoundingClientRect().top;
+            if (top < highest) { highest = top; winner = section.id; }
+          });
+
+          /* No winner means the band is over the hero, or over a section
+             with no nav link of its own. Nothing is current, and no link
+             is marked — which is the honest answer, not a stale one. */
+          markCurrent(winner);
+        }, { rootMargin: '-40% 0px -20% 0px', threshold: 0 });
+
+        watched.forEach(function (section) { navObserver.observe(section); });
+      }
     }
 
   });

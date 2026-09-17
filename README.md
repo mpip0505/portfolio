@@ -12,26 +12,59 @@ Import this repo into Vercel and deploy with framework preset **Other** — ther
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | The entire site. |
-| `styles.css` | Structure, rhythm, layout. Token-driven; no `@import`. |
-| `theme-coastal.css` | Colour, type, motifs and all motion. Loaded second — it re-points the tokens `styles.css` reads, so removing this one `<link>` restores the original palette. |
-| `motion.js` | Hero entrance and IntersectionObserver scroll reveals. ~1KB, no dependencies. |
+| `index.html` | The entire site, plus the inline SVG `#duotone` filter the portrait is painted through. |
+| `styles.css` | Everything visual: tokens, structure, rhythm, type, motion. One sheet, no `@import`. |
+| `motion.js` | Hero entrance, scroll reveals, pointer tilt/parallax, the project filter, and the active-section nav highlight. No dependencies. |
+| `assets/portrait.jpg` | The portrait, 640×853 (2× the 320px box it is shown in). |
+| `assets/favicon.svg` | The monogram as a tab icon — what modern browsers use, and the source the other two are generated from. |
+| `favicon.ico` | 16/32/48 bitmaps of the same mark, for older browsers and the bare `/favicon.ico` request. The 16px bitmap is drawn heavier so it survives a tab strip. |
+| `assets/apple-touch-icon.png` | 180×180 of the same mark, full-bleed — iOS applies its own rounded mask. |
 | `vercel.json` | Cache-Control headers for static assets. |
+
+## The monogram
+
+One emblem — an **"A" inside a hairline ring** — in four places, the same mark
+in all of them: the centred nav mark and the footer stamp (both inline SVG in
+`index.html`), and the three icon files above.
+
+The ring is the single gold accent and the only gold in the nav. The letter
+never carries gold: it is pine on the cream masthead and cream on the pine
+footer, which is the only thing that differs between placements. The "A" is
+drawn as paths rather than set in Cormorant, so it holds together at 16px
+where a serif A with thin strokes and serifs would turn to mush.
+
+The golf flag-pin survives as the small decorative pin on the portrait — it is
+a pin on a photograph, not the identity mark, so the two do not compete.
+
+## Tuning
+
+Everything retunes from the token block at the top of `styles.css`. Two of the
+knobs there are switches:
+
+| Token | Default | Effect |
+| --- | --- | --- |
+| `--grain-opacity` | `0.035` | Strength of the paper grain over the cream. `0` turns it off. |
+| `--duotone` | `1` | `1` maps the portrait into the palette (pine shadows, cream highlights); `0` shows the untouched photograph. |
+
+`--duotone` is read by a CSS style query, so it can also be flipped per element.
+Any other image takes the same treatment by adding `class="duotone"` to it.
 
 ## Motion
 
 `motion.js` sets `data-motion="on"` on `<html>` before the first paint, and only
 when `prefers-reduced-motion` is not `reduce`. Every animation rule in
-`theme-coastal.css` is gated on that attribute, so reduced motion, a failed
+`styles.css` is gated on that attribute, so reduced motion, a failed
 script and no JavaScript at all each land on the same result: the page renders
 in its final state. Only `opacity` and `transform` are animated — nothing in the
 theme can shift layout.
+
+The active-section nav underline is deliberately *not* gated on that flag: it is
+orientation, not motion, so it runs under `prefers-reduced-motion` too.
 
 Add `data-reveal` to any element to give it a scroll reveal. Nothing indexes or
 names them.
 
 ## Adding a project
 
-Copy any `<article>` inside `#work` and change the text. Nothing in `styles.css`
-counts, indexes or names projects. Add `data-emphasis="lead"` for the heavier
-treatment; omit it for the compact treatment.
+Copy any `<li>` inside `#work`, set its `data-category`, bump the numeral, and
+update `data-total` on `.projects` along with the count in the section head.
