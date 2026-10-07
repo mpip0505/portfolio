@@ -208,53 +208,152 @@
   </section>
 
   <!-- ====================================================================
-       3 · Work — filterable grid. Duplicate any <li> to add a project:
-       set data-category (cloud / ml / cv / hackathon, space separated),
-       bump the numeral, and update data-total on .projects + the count.
+       3 · Work — three featured projects, one per row. Each <article>
+       carries its own screenshot marquee (see "Marquee" in styles.css):
+       the real three screenshots, then the same three again inside an
+       aria-hidden list with empty alt, which is what makes the loop
+       seamless without a screen reader hearing anything twice.
+
+       Screenshots live in assets/projects/<slug>/1, 2, 3 (.jpg for real
+       shots, ~1600px wide; .png for the transparent placeholders, which let
+       the neutral box drawn by .shot show through). Each alt says what its
+       screenshot shows.
+
+       Speed: --marquee-duration on the .marquee is one full loop — bigger
+       is slower. Direction: add or remove marquee--reverse. Alternate it
+       down the list so neighbouring rows never move in step.
        ==================================================================== -->
   <section id="work" class="work" aria-labelledby="work-title" data-reveal>
-    <header class="section-head section-head--work">
+    <header class="section-head">
       <p class="eyebrow">Selected work</p>
       <h2 id="work-title" class="section-title">Projects</h2>
-      <p class="count" aria-live="polite">Showing <span class="count-n" data-count>5</span> of 5</p>
     </header>
 
-    <ul class="filters" data-filters aria-label="Filter projects by category">
-      <li><button type="button" data-filter="all" aria-pressed="true">All</button></li>
-      <li><button type="button" data-filter="cloud" aria-pressed="false">Cloud</button></li>
-      <li><button type="button" data-filter="ml" aria-pressed="false">ML</button></li>
-      <li><button type="button" data-filter="cv" aria-pressed="false">Computer Vision</button></li>
-      <li><button type="button" data-filter="hackathon" aria-pressed="false">Hackathon</button></li>
+    <ul class="projects">
+
+      <li data-rise>
+        <article class="card">
+          <header class="card-head">
+            <p class="card-meta"><span class="card-num">01</span><span class="card-cat">Computer Vision · ML · Hackathon</span></p>
+            <h3 class="card-title">Project Guardian</h3>
+            <p class="card-blurb">Maritime vessel detection from imagery, built at the SEDIC Hackathon 2026 on a YOLO detection pipeline.</p>
+          </header>
+          <ul class="tags">
+            <li>Python</li>
+            <li>YOLO</li>
+            <li>PyTorch</li>
+          </ul>
+          <ul class="card-links">
+            <li><a href="https://github.com/mpip0505/sedic-hackathon-2026">Repository</a></li>
+          </ul>
+          <div class="marquee marquee--shots" style="--marquee-duration: 46s"
+            role="group" aria-label="Project Guardian screenshots" tabindex="0">
+            <div class="marquee-track">
+              <ul class="marquee-group">
+                <li><figure class="shot"><img src="assets/projects/project-guardian/1.jpg" width="1600" height="718" loading="lazy" decoding="async" alt="Project Guardian — the detection dashboard, with system status, model info and vessel counts by class"></figure></li>
+                <li><figure class="shot"><img src="assets/projects/project-guardian/2.jpg" width="655" height="468" loading="lazy" decoding="async" alt="Project Guardian — an aircraft carrier boxed and labelled military_vessel at 0.92 confidence"></figure></li>
+                <li><figure class="shot"><img src="assets/projects/project-guardian/3.jpg" width="1600" height="908" loading="lazy" decoding="async" alt="Project Guardian — a military-contact alert with the second-stage classifier marking the ship as Malaysian RMN"></figure></li>
+              </ul>
+              <ul class="marquee-group" aria-hidden="true">
+                <li><figure class="shot"><img src="assets/projects/project-guardian/1.jpg" width="1600" height="718" loading="lazy" decoding="async" alt=""></figure></li>
+                <li><figure class="shot"><img src="assets/projects/project-guardian/2.jpg" width="655" height="468" loading="lazy" decoding="async" alt=""></figure></li>
+                <li><figure class="shot"><img src="assets/projects/project-guardian/3.jpg" width="1600" height="908" loading="lazy" decoding="async" alt=""></figure></li>
+              </ul>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-rise>
+        <article class="card">
+          <header class="card-head">
+            <p class="card-meta"><span class="card-num">02</span><span class="card-cat">Hackathon</span></p>
+            <h3 class="card-title">Solare</h3>
+            <p class="card-blurb">Solar-farm monitoring that flags soiled panel blocks and puts a ringgit figure on cleaning them, built at the UM Deep Tech Hackathon.</p>
+          </header>
+          <ul class="tags">
+            <li class="tags-pending">Stack to be confirmed</li>
+          </ul>
+          <!-- TODO: no tech tags for this one — the previous build recorded the
+               stack as "TBC". Replace the pending item with the real tags. -->
+          <ul class="card-links">
+            <li><a href="https://github.com/aarntn/TripleT_DeepTech">Repository</a></li>
+            <!-- TODO: the previous build also listed https://solare-demo.vercel.app
+                 as a live site for this project. Confirm it still resolves, then
+                 add it back as a second <li> link. -->
+          </ul>
+          <div class="marquee marquee--shots marquee--reverse" style="--marquee-duration: 52s"
+            role="group" aria-label="Solare screenshots" tabindex="0">
+            <div class="marquee-track">
+              <ul class="marquee-group">
+                <li><figure class="shot"><img src="assets/projects/solare/1.jpg" width="1600" height="908" loading="lazy" decoding="async" alt="Solare — the operations overview, with estimated loss, recoverable revenue and farm output"></figure></li>
+                <li><figure class="shot"><img src="assets/projects/solare/2.jpg" width="1600" height="908" loading="lazy" decoding="async" alt="Solare — the investment payback calculator, with payback period, NPV and carbon credits"></figure></li>
+                <li><figure class="shot"><img src="assets/projects/solare/3.jpg" width="1600" height="908" loading="lazy" decoding="async" alt="Solare — the farm map, with panel blocks coloured by efficiency over satellite imagery"></figure></li>
+              </ul>
+              <ul class="marquee-group" aria-hidden="true">
+                <li><figure class="shot"><img src="assets/projects/solare/1.jpg" width="1600" height="908" loading="lazy" decoding="async" alt=""></figure></li>
+                <li><figure class="shot"><img src="assets/projects/solare/2.jpg" width="1600" height="908" loading="lazy" decoding="async" alt=""></figure></li>
+                <li><figure class="shot"><img src="assets/projects/solare/3.jpg" width="1600" height="908" loading="lazy" decoding="async" alt=""></figure></li>
+              </ul>
+            </div>
+          </div>
+        </article>
+      </li>
+
     </ul>
 
-    <ul class="projects" data-projects data-total="5">
+    <p class="work-more">
+      These are the highlights — the rest of my projects live on
+      <a href="https://github.com/mpip0505?tab=repositories">GitHub</a>.
+    </p>
 
-      <li data-category="cloud">
+    <!-- Archived projects — taken off the featured list, kept here verbatim
+         in the current format. To bring one back, move its <li> into the
+         list above, fix the numeral, alternate marquee--reverse, and drop
+         three screenshots into its assets/projects/<slug>/ folder.
+
+      <li data-rise>
         <article class="card">
-          <p class="card-meta"><span class="card-num">01</span><span class="card-cat">Cloud</span></p>
-          <h3 class="card-title">Cable Orders &amp; Delivery Tracking</h3>
-          <p class="pill pill--live">Live</p>
-          <p class="card-blurb">Live order-and-delivery tracking for a ship-cable supplier.</p>
+          <header class="card-head">
+            <p class="card-meta"><span class="card-num">03</span><span class="card-cat">Cloud</span></p>
+            <h3 class="card-title">Cable Orders &amp; Delivery Tracking</h3>
+            <p class="pill pill--live">Live</p>
+            <p class="card-blurb">Live order-and-delivery tracking for a ship-cable supplier.</p>
+          </header>
           <ul class="tags">
             <li>Supabase</li>
             <li>Postgres</li>
             <li>React</li>
             <li>Vercel</li>
           </ul>
-          <!-- TODO: no repository or live URL for this project exists yet — the
-               previous build pointed both links at the GitHub profile page, so
-               nothing real was available to carry over. Drop the URL in here. -->
           <ul class="card-links">
             <li><span class="link-pending">Link coming soon</span></li>
           </ul>
+          <div class="marquee marquee--shots" style="--marquee-duration: 48s"
+            role="group" aria-label="Cable Orders and Delivery Tracking screenshots" tabindex="0">
+            <div class="marquee-track">
+              <ul class="marquee-group">
+                <li><figure class="shot"><img src="assets/projects/cable-orders/1.png" width="1280" height="800" loading="lazy" decoding="async" alt="Cable Orders and Delivery Tracking, screenshot 1 of 3"></figure></li>
+                <li><figure class="shot"><img src="assets/projects/cable-orders/2.png" width="1280" height="800" loading="lazy" decoding="async" alt="Cable Orders and Delivery Tracking, screenshot 2 of 3"></figure></li>
+                <li><figure class="shot"><img src="assets/projects/cable-orders/3.png" width="1280" height="800" loading="lazy" decoding="async" alt="Cable Orders and Delivery Tracking, screenshot 3 of 3"></figure></li>
+              </ul>
+              <ul class="marquee-group" aria-hidden="true">
+                <li><figure class="shot"><img src="assets/projects/cable-orders/1.png" width="1280" height="800" loading="lazy" decoding="async" alt=""></figure></li>
+                <li><figure class="shot"><img src="assets/projects/cable-orders/2.png" width="1280" height="800" loading="lazy" decoding="async" alt=""></figure></li>
+                <li><figure class="shot"><img src="assets/projects/cable-orders/3.png" width="1280" height="800" loading="lazy" decoding="async" alt=""></figure></li>
+              </ul>
+            </div>
+          </div>
         </article>
       </li>
 
-      <li data-category="cloud ml">
+      <li data-rise>
         <article class="card">
-          <p class="card-meta"><span class="card-num">02</span><span class="card-cat">Cloud · ML</span></p>
-          <h3 class="card-title">Golf Prediction Platform</h3>
-          <p class="card-blurb">PGA Tour scoring predictor that retrains and redeploys itself on a schedule.</p>
+          <header class="card-head">
+            <p class="card-meta"><span class="card-num">04</span><span class="card-cat">Cloud · ML</span></p>
+            <h3 class="card-title">Golf Prediction Platform</h3>
+            <p class="card-blurb">PGA Tour scoring predictor that retrains and redeploys itself on a schedule.</p>
+          </header>
           <ul class="tags">
             <li>Python</li>
             <li>scikit-learn</li>
@@ -265,31 +364,31 @@
             <li><a href="https://mpip0505.github.io/golf-score-predictor/">Live site</a></li>
             <li><a href="https://github.com/mpip0505/golf-score-predictor">Repository</a></li>
           </ul>
+          <div class="marquee marquee--shots marquee--reverse" style="--marquee-duration: 50s"
+            role="group" aria-label="Golf Prediction Platform screenshots" tabindex="0">
+            <div class="marquee-track">
+              <ul class="marquee-group">
+                <li><figure class="shot"><img src="assets/projects/golf-predictor/1.png" width="1280" height="800" loading="lazy" decoding="async" alt="Golf Prediction Platform, screenshot 1 of 3"></figure></li>
+                <li><figure class="shot"><img src="assets/projects/golf-predictor/2.png" width="1280" height="800" loading="lazy" decoding="async" alt="Golf Prediction Platform, screenshot 2 of 3"></figure></li>
+                <li><figure class="shot"><img src="assets/projects/golf-predictor/3.png" width="1280" height="800" loading="lazy" decoding="async" alt="Golf Prediction Platform, screenshot 3 of 3"></figure></li>
+              </ul>
+              <ul class="marquee-group" aria-hidden="true">
+                <li><figure class="shot"><img src="assets/projects/golf-predictor/1.png" width="1280" height="800" loading="lazy" decoding="async" alt=""></figure></li>
+                <li><figure class="shot"><img src="assets/projects/golf-predictor/2.png" width="1280" height="800" loading="lazy" decoding="async" alt=""></figure></li>
+                <li><figure class="shot"><img src="assets/projects/golf-predictor/3.png" width="1280" height="800" loading="lazy" decoding="async" alt=""></figure></li>
+              </ul>
+            </div>
+          </div>
         </article>
       </li>
 
-      <li data-category="cv ml hackathon">
+      <li data-rise>
         <article class="card">
-          <p class="card-meta"><span class="card-num">03</span><span class="card-cat">Computer Vision · ML · Hackathon</span></p>
-          <h3 class="card-title">Project Guardian</h3>
-          <p class="card-blurb">Maritime vessel detection from imagery, built at the SEDIC
-            Hackathon 2026 on a YOLO detection pipeline.</p>
-          <ul class="tags">
-            <li>Python</li>
-            <li>YOLO</li>
-            <li>PyTorch</li>
-          </ul>
-          <ul class="card-links">
-            <li><a href="https://github.com/mpip0505/sedic-hackathon-2026">Repository</a></li>
-          </ul>
-        </article>
-      </li>
-
-      <li data-category="hackathon ml">
-        <article class="card">
-          <p class="card-meta"><span class="card-num">04</span><span class="card-cat">Hackathon · ML</span></p>
-          <h3 class="card-title">Climate Risk Model</h3>
-          <p class="card-blurb">A climate-risk model built at the <abbr title="Malaysian Actuarial Students' Association">MASA</abbr> Hackathon 2026.</p>
+          <header class="card-head">
+            <p class="card-meta"><span class="card-num">05</span><span class="card-cat">Hackathon · ML</span></p>
+            <h3 class="card-title">Climate Risk Model</h3>
+            <p class="card-blurb">A climate-risk model built at the <abbr title="Malaysian Actuarial Students' Association">MASA</abbr> Hackathon 2026.</p>
+          </header>
           <ul class="tags">
             <li>Python</li>
             <li>statsmodels</li>
@@ -299,29 +398,24 @@
             <li><a href="https://masa-triplet.netlify.app">Live site</a></li>
             <li><a href="https://github.com/aarntn/MASA-HACKATHON-2026">Repository</a></li>
           </ul>
+          <div class="marquee marquee--shots" style="--marquee-duration: 44s"
+            role="group" aria-label="Climate Risk Model screenshots" tabindex="0">
+            <div class="marquee-track">
+              <ul class="marquee-group">
+                <li><figure class="shot"><img src="assets/projects/climate-risk-model/1.png" width="1280" height="800" loading="lazy" decoding="async" alt="Climate Risk Model, screenshot 1 of 3"></figure></li>
+                <li><figure class="shot"><img src="assets/projects/climate-risk-model/2.png" width="1280" height="800" loading="lazy" decoding="async" alt="Climate Risk Model, screenshot 2 of 3"></figure></li>
+                <li><figure class="shot"><img src="assets/projects/climate-risk-model/3.png" width="1280" height="800" loading="lazy" decoding="async" alt="Climate Risk Model, screenshot 3 of 3"></figure></li>
+              </ul>
+              <ul class="marquee-group" aria-hidden="true">
+                <li><figure class="shot"><img src="assets/projects/climate-risk-model/1.png" width="1280" height="800" loading="lazy" decoding="async" alt=""></figure></li>
+                <li><figure class="shot"><img src="assets/projects/climate-risk-model/2.png" width="1280" height="800" loading="lazy" decoding="async" alt=""></figure></li>
+                <li><figure class="shot"><img src="assets/projects/climate-risk-model/3.png" width="1280" height="800" loading="lazy" decoding="async" alt=""></figure></li>
+              </ul>
+            </div>
+          </div>
         </article>
       </li>
-
-      <li data-category="hackathon">
-        <article class="card">
-          <p class="card-meta"><span class="card-num">05</span><span class="card-cat">Hackathon</span></p>
-          <h3 class="card-title">Solare</h3>
-          <p class="card-blurb">Deep-tech entry from the UM Deep Tech Hackathon.</p>
-          <!-- TODO: no tech tags for this one — the previous build recorded the
-               stack as "TBC". Add the real tags as <li> items below. -->
-          <ul class="tags">
-            <li class="tags-pending">Stack to be confirmed</li>
-          </ul>
-          <ul class="card-links">
-            <li><a href="https://github.com/aarntn/TripleT_DeepTech">Repository</a></li>
-            <!-- TODO: the previous build also listed https://solare-demo.vercel.app
-                 as a live site for this project. Confirm it still resolves, then
-                 add it back as a second <li> link. -->
-          </ul>
-        </article>
-      </li>
-
-    </ul>
+    -->
   </section>
 
   <!-- ====================================================================
@@ -334,6 +428,13 @@
     </header>
 
     <ul class="ruled-list">
+      <li>
+        <article class="entry">
+          <h3>SEDIC Hackathon 2026</h3>
+          <p class="entry-meta">SEDIC · Project Guardian</p>
+          <p class="entry-note">Semi-Finalist</p>
+        </article>
+      </li>
       <li>
         <article class="entry">
           <h3>National Deep Tech Challenge 2026</h3>
@@ -400,7 +501,14 @@
   </section>
 
   <!-- ====================================================================
-       6 · Stack — real content carried over from the previous build.
+       6 · Stack — icons only, one marquee row per category. Every icon is
+       an external <use> into its own file in assets/icons/ (Simple Icons,
+       plus the Devicon AWS mark), so nothing is fetched from a CDN and
+       the icon takes currentColor: muted at rest, --brand on hover.
+       Accessible name on the <svg>, tooltip from title on the chip.
+
+       Rows alternate direction and run at slightly different speeds so
+       they never line up. Same marquee as the projects above.
        ==================================================================== -->
   <section id="stack" class="stack" aria-labelledby="stack-title" data-reveal>
     <header class="section-head">
@@ -411,50 +519,145 @@
     <ul class="stack-groups">
       <li>
         <article class="stack-group">
-          <h3>Cloud &amp; Infra</h3>
-          <ul class="tags">
-            <li>Supabase</li>
-            <li><abbr title="Amazon Web Services">AWS</abbr></li>
-            <li>Vercel</li>
-            <li>GitHub Actions</li>
-            <li>Postgres</li>
-          </ul>
+          <h3 id="stack-cloud">Cloud &amp; Infra</h3>
+          <div class="marquee marquee--icons" style="--marquee-duration: 38s"
+            role="group" aria-labelledby="stack-cloud" tabindex="0">
+            <div class="marquee-track">
+              <ul class="marquee-group">
+                <li class="chip" title="Supabase" style="--brand: #3FCF8E">
+                  <svg role="img" aria-label="Supabase" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/supabase.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="Amazon Web Services" style="--brand: #FF9900">
+                  <svg role="img" aria-label="Amazon Web Services" width="40" height="40" viewBox="0 0 128 128" focusable="false"><use href="assets/icons/aws.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="Vercel" style="--brand: #000000">
+                  <svg role="img" aria-label="Vercel" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/vercel.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="GitHub Actions" style="--brand: #2088FF">
+                  <svg role="img" aria-label="GitHub Actions" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/githubactions.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="PostgreSQL" style="--brand: #4169E1">
+                  <svg role="img" aria-label="PostgreSQL" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/postgresql.svg#icon"/></svg>
+                </li>
+              </ul>
+              <ul class="marquee-group" aria-hidden="true">
+                <li class="chip" title="Supabase" style="--brand: #3FCF8E">
+                  <svg role="img" aria-label="Supabase" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/supabase.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="Amazon Web Services" style="--brand: #FF9900">
+                  <svg role="img" aria-label="Amazon Web Services" width="40" height="40" viewBox="0 0 128 128" focusable="false"><use href="assets/icons/aws.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="Vercel" style="--brand: #000000">
+                  <svg role="img" aria-label="Vercel" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/vercel.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="GitHub Actions" style="--brand: #2088FF">
+                  <svg role="img" aria-label="GitHub Actions" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/githubactions.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="PostgreSQL" style="--brand: #4169E1">
+                  <svg role="img" aria-label="PostgreSQL" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/postgresql.svg#icon"/></svg>
+                </li>
+              </ul>
+            </div>
+          </div>
         </article>
       </li>
       <li>
         <article class="stack-group">
-          <h3>Data &amp; ML</h3>
-          <ul class="tags">
-            <li>scikit-learn</li>
-            <li>PyTorch</li>
-            <li>YOLO</li>
-            <li>statsmodels</li>
-            <li>Monte Carlo</li>
-            <li><abbr title="Machine Learning Operations">MLOps</abbr></li>
-          </ul>
+          <h3 id="stack-ml">Data &amp; ML</h3>
+          <!-- TODO: no good icon for statsmodels, Monte Carlo or MLOps — left out for now. -->
+          <div class="marquee marquee--icons marquee--reverse" style="--marquee-duration: 44s"
+            role="group" aria-labelledby="stack-ml" tabindex="0">
+            <div class="marquee-track">
+              <ul class="marquee-group">
+                <li class="chip" title="scikit-learn" style="--brand: #F7931E">
+                  <svg role="img" aria-label="scikit-learn" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/scikitlearn.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="PyTorch" style="--brand: #EE4C2C">
+                  <svg role="img" aria-label="PyTorch" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/pytorch.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="YOLO" style="--brand: #111F68">
+                  <svg role="img" aria-label="YOLO" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/yolo.svg#icon"/></svg>
+                </li>
+              </ul>
+              <ul class="marquee-group" aria-hidden="true">
+                <li class="chip" title="scikit-learn" style="--brand: #F7931E">
+                  <svg role="img" aria-label="scikit-learn" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/scikitlearn.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="PyTorch" style="--brand: #EE4C2C">
+                  <svg role="img" aria-label="PyTorch" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/pytorch.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="YOLO" style="--brand: #111F68">
+                  <svg role="img" aria-label="YOLO" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/yolo.svg#icon"/></svg>
+                </li>
+              </ul>
+            </div>
+          </div>
         </article>
       </li>
       <li>
         <article class="stack-group">
-          <h3>Languages</h3>
-          <ul class="tags">
-            <li>Python</li>
-            <li>JavaScript</li>
-            <li><abbr title="Structured Query Language">SQL</abbr></li>
-            <li><abbr title="HyperText Markup Language">HTML</abbr></li>
-            <li><abbr title="Cascading Style Sheets">CSS</abbr></li>
-          </ul>
+          <h3 id="stack-lang">Languages</h3>
+          <!-- TODO: no good icon for SQL — left out for now. -->
+          <div class="marquee marquee--icons" style="--marquee-duration: 41s"
+            role="group" aria-labelledby="stack-lang" tabindex="0">
+            <div class="marquee-track">
+              <ul class="marquee-group">
+                <li class="chip" title="Python" style="--brand: #3776AB">
+                  <svg role="img" aria-label="Python" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/python.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="JavaScript" style="--brand: #F7DF1E">
+                  <svg role="img" aria-label="JavaScript" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/javascript.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="HTML5" style="--brand: #E34F26">
+                  <svg role="img" aria-label="HTML5" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/html5.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="CSS" style="--brand: #663399">
+                  <svg role="img" aria-label="CSS" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/css.svg#icon"/></svg>
+                </li>
+              </ul>
+              <ul class="marquee-group" aria-hidden="true">
+                <li class="chip" title="Python" style="--brand: #3776AB">
+                  <svg role="img" aria-label="Python" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/python.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="JavaScript" style="--brand: #F7DF1E">
+                  <svg role="img" aria-label="JavaScript" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/javascript.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="HTML5" style="--brand: #E34F26">
+                  <svg role="img" aria-label="HTML5" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/html5.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="CSS" style="--brand: #663399">
+                  <svg role="img" aria-label="CSS" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/css.svg#icon"/></svg>
+                </li>
+              </ul>
+            </div>
+          </div>
         </article>
       </li>
       <li>
         <article class="stack-group">
-          <h3>Tooling</h3>
-          <ul class="tags">
-            <li>React</li>
-            <li>Git</li>
-            <li><abbr title="Continuous Integration and Continuous Deployment">CI/CD</abbr></li>
-            <li>Excel export</li>
-          </ul>
+          <h3 id="stack-tools">Tooling</h3>
+          <!-- TODO: no good icon for CI/CD or Excel export — left out for now. -->
+          <div class="marquee marquee--icons marquee--reverse" style="--marquee-duration: 47s"
+            role="group" aria-labelledby="stack-tools" tabindex="0">
+            <div class="marquee-track">
+              <ul class="marquee-group">
+                <li class="chip" title="React" style="--brand: #61DAFB">
+                  <svg role="img" aria-label="React" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/react.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="Git" style="--brand: #F03C2E">
+                  <svg role="img" aria-label="Git" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/git.svg#icon"/></svg>
+                </li>
+              </ul>
+              <ul class="marquee-group" aria-hidden="true">
+                <li class="chip" title="React" style="--brand: #61DAFB">
+                  <svg role="img" aria-label="React" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/react.svg#icon"/></svg>
+                </li>
+                <li class="chip" title="Git" style="--brand: #F03C2E">
+                  <svg role="img" aria-label="Git" width="40" height="40" viewBox="0 0 24 24" focusable="false"><use href="assets/icons/git.svg#icon"/></svg>
+                </li>
+              </ul>
+            </div>
+          </div>
         </article>
       </li>
     </ul>

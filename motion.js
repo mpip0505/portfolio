@@ -1,6 +1,7 @@
 /* ==========================================================================
-   motion.js — hero entrance, scroll reveals, pointer tilt and parallax,
-   project filter, active-section nav. No dependencies, no build step.
+   motion.js — hero entrance, scroll reveals, pointer parallax, active-
+   section nav. No dependencies, no build step. The marquees in Work and
+   Stack are not in here at all: they are CSS only.
 
    Loaded from <head> without defer, on purpose: it has to set the
    data-motion flag before the first paint, otherwise the page renders its
@@ -11,18 +12,17 @@
      - reduced motion          -> the flag is never set, no CSS motion matches
      - no JavaScript           -> the flag is never set, same outcome
      - no IntersectionObserver -> everything is released immediately
-     - coarse pointer          -> tilt and pointer parallax are never bound
-   In all four cases the page is fully visible and fully readable, and the
-   filter still works — it just switches instantly instead of cross-fading.
+     - coarse pointer          -> pointer parallax is never bound
+   In all four cases the page is fully visible and fully readable.
 
    One thing here is not motion and is not gated on it: the active-section
-   nav highlight (8). It is an orientation cue, so it runs for everyone who
+   nav highlight (6). It is an orientation cue, so it runs for everyone who
    has IntersectionObserver, reduced motion or not.
 
    The 3D is a collaboration, and the split is strict: the stylesheet owns
    the shape of every transform and every cap, this file owns nothing but
-   the numbers that flow into them. It reads --tilt-max, --tilt-lift,
-   --parallax-depth and --hero-rot off :root with getComputedStyle, so the
+   the numbers that flow into them. It reads --parallax-depth, --hero-rot
+   and --portrait-rot off :root with getComputedStyle, so the
    whole feel retunes from the token block in styles.css and no intensity
    is ever hard-coded here.
    ========================================================================== */
@@ -38,7 +38,7 @@
 
   var MOTION = !media('(prefers-reduced-motion: reduce)');
 
-  /* Pointer tilt and pointer parallax need a pointer that can hover and can
+  /* Pointer parallax needs a pointer that can hover and can
      leave. A touchscreen has neither, so on coarse pointers they are never
      bound at all — touch stays flat, and the CSS carries a second guard. */
   var FINE = MOTION && !media('(pointer: coarse)');
@@ -56,8 +56,6 @@
     return isNaN(n) ? fallback : n;
   }
 
-  var TILT_MAX = knob('--tilt-max', 5);         /* deg */
-  var TILT_Z   = knob('--tilt-lift', 8);        /* px  */
   var DEPTH    = knob('--parallax-depth', 12);  /* px  */
   var HERO_ROT = knob('--hero-rot', 1.5);       /* deg */
   var PORT_ROT = knob('--portrait-rot', 3.5);   /* deg */
@@ -169,10 +167,11 @@
     }
 
     /* ----------------------------------------------------------------------
-       2 · Scroll reveals. One observer for every [data-reveal] section.
+       2 · Scroll reveals. One observer for every [data-reveal] section and
+       every [data-rise] project; the stylesheet gives each its own shape.
        ---------------------------------------------------------------------- */
 
-    var reveals = document.querySelectorAll('[data-reveal]');
+    var reveals = document.querySelectorAll('[data-reveal], [data-rise]');
     var i;
 
     function releaseAll() {
@@ -196,117 +195,7 @@
     }
 
     /* ----------------------------------------------------------------------
-       3 · Project grid — staggered entrance, then the filter.
-       ---------------------------------------------------------------------- */
-
-    var grid = document.querySelector('[data-projects]');
-    var bar  = document.querySelector('[data-filters]');
-    var out  = document.querySelector('[data-count]');
-
-    if (grid) {
-      var items = Array.prototype.slice.call(grid.children);
-      var CARD_STEP = knob('--stagger-card', 55);   /* project card step   */
-      var FADE      = knob('--dur-fast', 200) * 0.95; /* filter out-phase, a
-                          hair under the micro duration so the swap happens
-                          while the cards are at their most transparent    */
-      var current   = 'all';
-
-      function matches(li, cat) {
-        if (cat === 'all') return true;
-        var own = (li.getAttribute('data-category') || '').split(/\s+/);
-        return own.indexOf(cat) !== -1;
-      }
-
-      /* Stagger the cards that are currently showing. The delay is cleared
-         again once it has been used, so a later filter change starts clean. */
-      function stagger() {
-        var n = 0;
-        items.forEach(function (li) {
-          if (li.hidden) { li.style.transitionDelay = ''; return; }
-          li.style.transitionDelay = (n * CARD_STEP) + 'ms';
-          n++;
-        });
-        window.setTimeout(function () {
-          items.forEach(function (li) { li.style.transitionDelay = ''; });
-        }, n * CARD_STEP + 700);
-      }
-
-      function setCount(n) {
-        if (!out) return;
-        if (!MOTION) { out.textContent = n; return; }
-        out.classList.add('is-ticking');
-        window.setTimeout(function () {
-          out.textContent = n;
-          out.classList.remove('is-ticking');
-        }, FADE);
-      }
-
-      function commit(cat) {
-        var shown = 0;
-        items.forEach(function (li) {
-          var on = matches(li, cat);
-          li.hidden = !on;
-          if (on) shown++;
-        });
-        setCount(shown);
-      }
-
-      /* The entrance. Cards sit in their resting-out state (CSS, via
-         .projects:not(.is-in)) until the grid scrolls into view. */
-      function release() {
-        stagger();
-        grid.classList.add('is-in');
-      }
-
-      if (!MOTION || !hasIO) {
-        grid.classList.add('is-in');
-      } else {
-        var gridObserver = new IntersectionObserver(function (entries, obs) {
-          entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            release();
-            obs.unobserve(entry.target);
-          });
-        }, { rootMargin: '0px 0px -5% 0px', threshold: 0.05 });
-
-        gridObserver.observe(grid);
-      }
-
-      /* -- the filter ---------------------------------------------------- */
-
-      if (bar) {
-        var buttons = Array.prototype.slice.call(bar.querySelectorAll('button[data-filter]'));
-
-        bar.addEventListener('click', function (event) {
-          var btn = event.target.closest('button[data-filter]');
-          if (!btn) return;
-
-          var cat = btn.getAttribute('data-filter');
-          if (cat === current) return;
-          current = cat;
-
-          buttons.forEach(function (b) {
-            b.setAttribute('aria-pressed', String(b === btn));
-          });
-
-          if (!MOTION) { commit(cat); return; }
-
-          /* Fade the grid out as one gesture, swap, then stagger back in.
-             Nothing reflows while anything is visible. */
-          grid.classList.remove('is-in');
-          window.setTimeout(function () {
-            commit(cat);
-            stagger();
-            /* One painted frame in the out state, so the cards that were
-               display:none actually transition in rather than snapping. */
-            nextFrame(function () { grid.classList.add('is-in'); });
-          }, FADE);
-        });
-      }
-    }
-
-    /* ----------------------------------------------------------------------
-       4 · Contour scroll drift. The back plane travels slower than the page
+       3 · Contour scroll drift. The back plane travels slower than the page
        it sits behind, which is the whole of the effect. Transform only,
        rAF-throttled, and it stops writing once the hero is off screen.
        ---------------------------------------------------------------------- */
@@ -333,71 +222,7 @@
     }
 
     /* ----------------------------------------------------------------------
-       5 · Project cards — pointer-tracked tilt.
-
-       The card leans towards the cursor, rises by --tilt-lift, and carries a
-       faint cream highlight under the pointer. Every angle is a fraction of
-       --tilt-max, so the cap is the token, not a clamp written here.
-       ---------------------------------------------------------------------- */
-
-    if (FINE) {
-      var cards = document.querySelectorAll('.projects > li > .card');
-
-      Array.prototype.forEach.call(cards, function (card) {
-        var box   = null;   /* measured on the <li>, which never tilts, so
-                               reading it can never chase its own output   */
-        var sheen = { x: 50, y: 0 };
-
-        var push = mover(['rx', 'ry', 'z'], function (v) {
-          card.style.setProperty('--tx', v.rx.toFixed(3) + 'deg');
-          card.style.setProperty('--ty', v.ry.toFixed(3) + 'deg');
-          card.style.setProperty('--tz', v.z.toFixed(2) + 'px');
-          card.style.setProperty('--sheen-x', sheen.x.toFixed(1) + '%');
-          card.style.setProperty('--sheen-y', sheen.y.toFixed(1) + '%');
-        }, function (v) {
-          /* Back at rest: hand the card back to the stylesheet, so a later
-             keyboard focus still gets the hover lift from CSS. */
-          if (v.rx || v.ry || v.z) return;
-          card.style.removeProperty('--tx');
-          card.style.removeProperty('--ty');
-          card.style.removeProperty('--tz');
-        });
-
-        card.addEventListener('pointerenter', function (event) {
-          if (event.pointerType === 'touch') return;
-          box = card.parentNode.getBoundingClientRect();
-          stale = false;
-          card.classList.add('is-tilting');
-        });
-
-        card.addEventListener('pointermove', function (event) {
-          if (event.pointerType === 'touch') return;
-          if (!box || stale) {
-            box = card.parentNode.getBoundingClientRect();
-            stale = false;
-          }
-
-          /* Towards the cursor: the edge nearest it is the edge that rises.
-             Nothing is written to the DOM here — only the target moves. */
-          var px = nx(event.clientX, box.left, box.width);
-          var py = nx(event.clientY, box.top,  box.height);
-
-          sheen.x = (px + 1) * 50;
-          sheen.y = (py + 1) * 50;
-
-          push({ rx: py * TILT_MAX, ry: -px * TILT_MAX, z: TILT_Z });
-        });
-
-        card.addEventListener('pointerleave', function () {
-          box = null;
-          card.classList.remove('is-tilting');
-          push({ rx: 0, ry: 0, z: 0 });
-        });
-      });
-    }
-
-    /* ----------------------------------------------------------------------
-       6 · Hero — pointer parallax across the three depth planes.
+       4 · Hero — pointer parallax across the three depth planes.
 
        One pair of offsets and one pair of angles, written on the hero and
        multiplied by each layer's own --plane in CSS: contours 0.35, the
@@ -442,7 +267,7 @@
     }
 
     /* ----------------------------------------------------------------------
-       7 · Portrait — the raised frame leans towards the cursor.
+       5 · Portrait — the raised frame leans towards the cursor.
 
        Only the two angles come from here. The lift, the scale and the
        stepped shadow are the stylesheet's :hover rule, so the photograph
@@ -484,7 +309,7 @@
     }
 
     /* ----------------------------------------------------------------------
-       8 · Active-section nav highlight.
+       6 · Active-section nav highlight.
 
        Not motion: this is orientation, so it is deliberately NOT gated on
        MOTION. It runs wherever IntersectionObserver exists, and where it

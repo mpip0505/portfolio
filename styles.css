@@ -122,38 +122,35 @@
 
   /* -- tuning knobs ----------------------------------------------------------
      THE retune surface. Every duration, delay, angle and offset on the page
-     resolves back to the nine values in this block — the stylesheet derives
-     its own aliases from them below, and motion.js reads --tilt-max,
-     --tilt-lift and --parallax-depth straight off :root with
-     getComputedStyle, so JS never carries a number of its own.
+     resolves back to the eight values in this block — the stylesheet derives
+     its own aliases from them below, and motion.js reads --parallax-depth
+     straight off :root with getComputedStyle, so JS never carries a number
+     of its own. The marquees are the one exception: they run on CSS alone
+     and keep their own knobs in the Marquee block.
 
      All of it is inert unless motion.js has set data-motion="on" on <html>. */
   --ease:            cubic-bezier(0.22, 1, 0.36, 1);
   --dur-fast:        200ms;   /* hover / focus feedback                     */
-  --dur:             500ms;   /* the default beat: entrances, filters       */
+  --dur:             500ms;   /* the default beat: entrances               */
   --dur-slow:        700ms;   /* rules drawing in, scroll reveals           */
   --stagger:         100ms;   /* hero step                                  */
 
-  --tilt-max:        5deg;    /* card pointer-tilt cap                      */
-  --tilt-lift:       8px;     /* card translateZ on hover                   */
+  --tilt-lift:       8px;     /* base Z lift: portrait hover, reveal depth  */
   --parallax-depth:  12px;    /* max hero layer offset                      */
   --perspective:     900px;   /* shared 3D viewing distance                 */
 
   /* -- derived: timings the sheet uses by name ------------------------------ */
   --dur-micro:    var(--dur-fast);   /* hover / focus feedback              */
-  --dur-filter:   var(--dur-fast);   /* filter out-phase                    */
-  --dur-card:     var(--dur);        /* project card: reveal AND filter     */
   --dur-entrance: var(--dur);        /* hero fade-up                        */
   --dur-reveal:   var(--dur-slow);   /* scroll reveal                       */
   --dur-rule:     var(--dur-slow);   /* hairline draw-in                    */
-  --stagger-card: 55ms;              /* project card step                   */
   --gem-delay:    calc(var(--stagger) * 6);  /* the diamond, last beat      */
   --drift:        24s;               /* contour drift cycle                 */
 
   /* -- derived: 3D --------------------------------------------------------- */
-  /* The three knobs motion.js parses must stay plain numbers: a custom
+  /* The knobs motion.js parses must stay plain numbers: a custom
      property is an untyped token stream, so getComputedStyle hands back
-     "calc(5deg * 0.7)" unevaluated and parseFloat gets nothing from it.
+     "calc(1.5deg * 0.7)" unevaluated and parseFloat gets nothing from it.
      Values only CSS ever reads may use calc() freely, as --portrait-z and
      --reveal-z do below. */
   --hero-rot:     1.5deg;   /* hero group rotation cap     — read by JS */
@@ -287,12 +284,11 @@ abbr[title] {
 
 a { color: var(--gold-ink); }
 
-/* The shared small-caps label: eyebrows, nav, filters, meta rows. */
+/* The shared small-caps label: eyebrows, nav, meta rows. */
 .eyebrow,
 .card-cat,
 .entry-note,
-.nav-list a,
-.filters button {
+.nav-list a {
   font-family: var(--sans);
   font-size: 0.7rem;
   font-weight: 500;
@@ -319,7 +315,6 @@ a { color: var(--gold-ink); }
   .card-cat,
   .entry-note,
   .nav-list a,
-  .filters button,
   .facts dt,
   .btn,
   .pill {
@@ -647,29 +642,6 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
   margin-block-start: 0.4rem;
 }
 
-.section-head--work {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.4rem 1.5rem;
-}
-
-.section-head--work .eyebrow { flex-basis: 100%; }
-
-.count {
-  margin-inline-start: auto;
-  color: var(--slate);
-  font-size: 0.8125rem;
-  letter-spacing: 0.02em;
-}
-
-/* Text figures like everything else, but tabular: the count runs 1-5 and
-   must not change width as it ticks, or the line reflows behind it. */
-.count-n {
-  display: inline-block;
-  font-variant-numeric: oldstyle-nums tabular-nums;
-}
-
 /* ==========================================================================
    3 · About
    ========================================================================== */
@@ -818,105 +790,235 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
 }
 
 /* ==========================================================================
-   4 · Work — filter bar + project grid
+   Marquee — one CSS-only infinite row, shared by Work and Stack
+
+   Markup: .marquee (the window) > .marquee-track (the thing that moves) >
+   two identical .marquee-group lists, the second aria-hidden. The track
+   slides from 0 to -50% — exactly one group — and the moment it lands the
+   second group is sitting where the first began, so the loop has no seam.
+
+   Two details keep that true at any width:
+     - each group is at least as wide as the window (min-inline-size:
+       100cqi, the window is the size container), so a short row never
+       shows an empty tail; spare room goes into space-around
+     - the gap is split as padding-inline on both ends of each group, so
+       the join between the two groups is exactly one gap, like every other
+
+   Knobs, per instance or per modifier:
+     --marquee-duration  one full loop; bigger is slower      (inline style)
+     --marquee-gap       space between items
+     --marquee-fade      width of the soft edge on each side
+     .marquee--reverse   runs the other way
+
+   No JavaScript and no data-motion flag, on purpose: the motion is gated on
+   the prefers-reduced-motion media query alone, so it runs without the
+   script. Outside that query — reduced motion, or a browser that does not
+   know the feature — the duplicate is display:none and each modifier falls
+   back to a still layout of its own. Only transform is ever animated.
+
+   The window is focusable (tabindex="0" in the markup) for two reasons:
+   focus pauses the row, which gives keyboard users the pause that hover
+   gives everyone else, and the still screenshot row scrolls sideways, which
+   a keyboard can only do to something it can focus.
    ========================================================================== */
 
-.filters {
+.marquee {
+  --marquee-duration: 40s;
+  --marquee-gap: 1rem;
+  --marquee-fade: 3.5rem;
+  container-type: inline-size;
+  min-inline-size: 0;
+  padding-block: 0.5rem 1rem;      /* room for the shadows and the hover lift */
+}
+
+.marquee:focus-visible { outline-offset: 2px; }
+
+.marquee-track { display: flex; }
+
+.marquee-group {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-block-end: clamp(2rem, 5vw, 2.75rem);
+  gap: var(--marquee-gap);
 }
 
-.filters button {
-  padding: 0.55rem 1.05rem;
-  background: transparent;
+/* Still: the duplicate only exists to close the loop. */
+.marquee-group[aria-hidden="true"] { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent,
+      #000 var(--marquee-fade), #000 calc(100% - var(--marquee-fade)), transparent);
+            mask-image: linear-gradient(to right, transparent,
+      #000 var(--marquee-fade), #000 calc(100% - var(--marquee-fade)), transparent);
+  }
+
+  .marquee-track {
+    inline-size: max-content;
+    animation: marquee var(--marquee-duration) linear infinite;
+    will-change: transform;
+  }
+
+  .marquee--reverse .marquee-track { animation-direction: reverse; }
+
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track { animation-play-state: paused; }
+
+  .marquee .marquee-group {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    min-inline-size: 100cqi;
+    padding-inline: calc(var(--marquee-gap) / 2);
+  }
+
+  .marquee-group[aria-hidden="true"] { display: flex; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* -- screenshots ----------------------------------------------------------
+   Every box is reserved before a byte arrives: the <img> carries
+   width/height and the figure carries the aspect-ratio, so nothing on the
+   page moves when the file lands. The figure's own fill is the placeholder
+   — a neutral sand panel that shows until (and through) a transparent or
+   missing image. Still fallback: one row you scroll sideways, snapping. */
+
+.marquee--shots {
+  --marquee-gap: clamp(0.85rem, 2vw, 1.25rem);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.shot {
+  inline-size: 20rem;                            /* no container units */
+  inline-size: clamp(14rem, 62cqi, 24rem);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  scroll-snap-align: start;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 11px,
+      color-mix(in srgb, var(--sand) 22%, transparent) 11px 12px),
+    var(--tag-fill);
+  box-shadow: var(--shadow-1);
+}
+
+.shot img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* -- icons ----------------------------------------------------------------
+   Muted at rest, brand colour on hover. The icon is an external <use>, so
+   it paints in currentColor and the chip only has to change `color`; each
+   chip carries its own --brand inline. Still fallback: a wrapped grid. */
+
+.marquee--icons { --marquee-gap: 0.75rem; }
+
+.marquee--icons .marquee-group { flex-wrap: wrap; }
+
+.chip {
+  display: grid;
+  place-items: center;
+  padding: 0.75rem;
   color: var(--slate);
-  border: 1px solid var(--hairline-2);
-  border-radius: 2px;
-  cursor: pointer;
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  box-shadow: var(--shadow-1);
 }
 
-.filters button:hover,
-.filters button:focus-visible {
-  color: var(--pine);
-  border-color: var(--gold);
+.chip svg { fill: currentColor; }
+
+.chip:hover {
+  color: var(--brand, var(--pine));
+  border-color: var(--hairline-2);
 }
 
-.filters button[aria-pressed="true"] {
-  background: var(--pine);
-  color: var(--cream);
-  border-color: var(--pine);
+@media (prefers-reduced-motion: no-preference) {
+  .chip,
+  .shot {
+    transition: transform var(--dur-micro) var(--ease),
+                box-shadow var(--dur-micro) var(--ease),
+                border-color var(--dur-micro) var(--ease),
+                color var(--dur-micro) var(--ease);
+  }
+
+  .chip:hover,
+  .shot:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+  }
 }
 
-.filters button[aria-pressed="true"]:hover,
-.filters button[aria-pressed="true"]:focus-visible { color: var(--cream); }
+/* ==========================================================================
+   4 · Work — three featured projects, one per row
+   ========================================================================== */
 
 .projects {
   display: grid;
-  gap: clamp(2.25rem, 5vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
-  grid-template-columns: minmax(0, 1fr);
-
-  /* The grid is the 3D container the cards enter through. */
-  perspective: var(--perspective);
+  gap: clamp(3rem, 7vw, 4.5rem);
 }
 
-/* Each card also gets its own viewing box, so a card in the right-hand
-   column tilts around its own centre instead of skewing away from the
-   middle of the grid. Same var, one viewing distance for the whole page. */
-.projects > li { perspective: var(--perspective); }
-
-@media (min-width: 40rem) {
-  .projects { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (min-width: 64rem) {
-  .projects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-
-/* Borderless and editorial: the only chrome is the 2px pine top rule. */
+/* Borderless and editorial: the only chrome is the 2px pine top rule.
+   Mobile stacks head, tags, screenshots, links. From 56rem the copy takes a
+   narrow left column and the screenshots span its full height on the
+   right; the 1fr last row is what absorbs the marquee's height, so the
+   copy rows stay tight at the top. */
 .card {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "tags" "shots" "links";
+  gap: 0.9rem;
+  align-items: start;
+  padding-block-start: 1.25rem;
+  border-block-start: 2px solid var(--pine);
+}
+
+@media (min-width: 56rem) {
+  .card {
+    grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "head shots" "tags shots" "links shots";
+    column-gap: clamp(2rem, 4vw, 3.5rem);
+  }
+}
+
+.card-head {
+  grid-area: head;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.6rem;
-  block-size: 100%;
-  padding-block-start: 1.25rem;
-  border-block-start: 2px solid var(--pine);
-  transform-origin: center;
 }
 
-/* Two layers behind the text, both bleeding past the card on negative
-   insets so the words never move and neither layer is ever in the layout:
+.card .tags     { grid-area: tags; }
+.card .marquee  { grid-area: shots; }
+.card-links     { grid-area: links; }
 
-   ::before  the raised surface — a warm panel that carries the elevation.
-             Invisible at rest, so the resting card stays flat and
-             borderless on the cream, exactly as drawn.
-   ::after   the sheen — a soft CREAM highlight that follows the cursor.
-             Never gold; gold stays rare.                                   */
-.card::before,
-.card::after {
+/* The raised surface — a warm panel that carries the elevation, bleeding
+   past the card on negative insets so the words never move and it is never
+   in the layout. Invisible at rest, so the resting card stays flat and
+   borderless on the cream, exactly as drawn. */
+.card::before {
   content: "";
   position: absolute;
   z-index: -1;                      /* behind the text, above the page      */
   inset: 0 -1.1rem -1.15rem;        /* the pine rule caps the panel         */
   border-radius: 0 0 3px 3px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.card::before {
   background: var(--card);
   box-shadow: var(--shadow-1);
-}
-
-.card::after {
-  background: radial-gradient(
-    18rem 18rem at var(--sheen-x, 50%) var(--sheen-y, 0%),
-    color-mix(in srgb, #fff 70%, var(--cream)) 0%,
-    color-mix(in srgb, var(--cream) 45%, transparent) 40%,
-    transparent 72%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Hover and keyboard focus raise the surface. Deliberately NOT gated on the
@@ -994,8 +1096,7 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-block-start: auto;
-  padding-block-start: 0.9rem;
+  padding-block-start: 0.35rem;
 }
 
 .card-links a {
@@ -1016,6 +1117,22 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
   font-size: 0.8125rem;
   font-style: italic;
 }
+
+/* Pointer to the rest of the repos, under the featured list. */
+.work-more {
+  margin-block-start: clamp(2.5rem, 6vw, 3.5rem);
+  color: var(--slate);
+}
+
+.work-more a {
+  color: var(--gold-ink);
+  text-decoration: none;
+  font-weight: 500;
+  border-block-end: 1px solid var(--hairline-2);
+}
+
+.work-more a:hover,
+.work-more a:focus-visible { border-block-end-color: var(--gold); }
 
 /* ==========================================================================
    5 · Ruled lists — achievements and certifications
@@ -1060,29 +1177,29 @@ main > section + section { border-block-start: 1px solid var(--hairline); }
 .entry-note[data-status="in-progress"] { color: var(--slate); }
 
 /* ==========================================================================
-   6 · Stack
+   6 · Stack — one ruled row per category: the name, then its icon marquee
    ========================================================================== */
 
-.stack-groups {
+.stack-groups { border-block-start: 1px solid var(--hairline); }
+
+.stack-groups > li { border-block-end: 1px solid var(--hairline); }
+
+.stack-group {
   display: grid;
-  gap: clamp(1.75rem, 4vw, 2.5rem);
-  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  padding-block: 1.1rem 0.6rem;
 }
 
-@media (min-width: 34rem) {
-  .stack-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 48rem) {
+  .stack-group {
+    grid-template-columns: 10rem minmax(0, 1fr);
+    align-items: center;
+    gap: 2rem;
+    padding-block: 0.6rem;
+  }
 }
 
-@media (min-width: 60rem) {
-  .stack-groups { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-
-.stack-group h3 {
-  font-size: clamp(1.05rem, 1rem + 0.22vw, 1.15rem);
-  padding-block-end: 0.6rem;
-  margin-block-end: 0.9rem;
-  border-block-end: 1px solid var(--hairline);
-}
+.stack-group h3 { font-size: clamp(1.05rem, 1rem + 0.22vw, 1.15rem); }
 
 /* ==========================================================================
    7 · Contact / footer — the pine block
@@ -1163,7 +1280,6 @@ html[data-motion="on"] .nav-list a,
 html[data-motion="on"] .nav-list a::after,
 html[data-motion="on"] .btn,
 html[data-motion="on"] .btn--quiet,
-html[data-motion="on"] .filters button,
 html[data-motion="on"] .card-links a,
 html[data-motion="on"] .contact-links a {
   transition: color var(--dur-micro) var(--ease),
@@ -1182,51 +1298,26 @@ html[data-motion="on"] .projects > li:focus-within .card-num {
   transform: translateX(3px);
 }
 
-/* -- 3D · project cards, the signature move --------------------------------
-   One transform declaration, four custom properties. CSS owns the shape of
-   the movement and the caps; motion.js only writes numbers into --tx, --ty,
-   --tz and the two sheen positions, which it derives from --tilt-max and
-   --tilt-lift read off :root. Retuning the feel means editing :root, never
-   this rule and never the script.                                          */
+/* -- project cards: a soft lift ------------------------------------------
+   The card rises a few pixels and the gold takes over the top rule; the
+   raised panel behind it fades in from the base rule above. The <li> owns
+   the scroll-rise, the card owns this, so the two never share a transform. */
 
-html[data-motion="on"] .projects > li .card {
-  transform: rotateX(var(--tx, 0deg))
-             rotateY(var(--ty, 0deg))
-             translateZ(var(--tz, 0px));
+html[data-motion="on"] .card {
   transition: transform var(--dur-fast) var(--ease),
-              box-shadow var(--dur-fast) var(--ease),
               border-color var(--dur-fast) var(--ease);
 }
 
-html[data-motion="on"] .card::before,
-html[data-motion="on"] .card::after {
+html[data-motion="on"] .card::before {
   transition: opacity var(--dur-fast) var(--ease),
               box-shadow var(--dur-fast) var(--ease);
 }
 
-/* Hover with no pointer tracking yet — and the resting target the card
-   eases back down to when the cursor leaves. */
 html[data-motion="on"] .projects > li:hover .card,
 html[data-motion="on"] .projects > li:focus-within .card {
-  --tz: var(--tilt-lift);
+  transform: translateY(-3px);
   border-block-start-color: var(--gold);
 }
-
-/* While the cursor is actually over the card, the transform follows it
-   frame by frame, so it must not also be chasing a 200ms transition. The
-   script smooths the values instead; the shadow still eases. */
-html[data-motion="on"] .card.is-tilting {
-  transition: box-shadow var(--dur-fast) var(--ease),
-              border-color var(--dur-fast) var(--ease);
-  will-change: transform;
-}
-
-html[data-motion="on"] .card.is-tilting::before {
-  opacity: 1;
-  box-shadow: var(--shadow-3);          /* rest -> hover -> lifted */
-}
-
-html[data-motion="on"] .card.is-tilting::after { opacity: 1; }
 
 /* -- 3D · hero planes ------------------------------------------------------
    Three layers, one pair of numbers. motion.js writes --px / --py (both
@@ -1372,56 +1463,39 @@ html[data-motion="on"] [data-reveal].is-revealed {
   transform: none;
 }
 
-/* -- project cards: one state machine for both the reveal and the filter ---
-   The <li> owns opacity and translate; the .card inside owns the hover lift.
-   Keeping them on separate elements means the two transitions never have to
-   out-specify each other, so each keeps its own duration.                   */
+/* -- project rise: fade + 16px, one article at a time ----------------------
+   Same observer and class as the section reveals, a quieter shape: no
+   depth, no tilt — each project simply settles up into place as it enters. */
 
-html[data-motion="on"] .projects > li {
-  transition: opacity var(--dur-card) var(--ease),
-              transform var(--dur-card) var(--ease);
-}
-
-/* Cards enter from behind the page and settle flat. The Z is what does the
-   scaling, so leaving cards on a filter change read as receding rather than
-   merely shrinking — and .projects already supplies the perspective. */
-html[data-motion="on"] .projects:not(.is-in) > li {
+html[data-motion="on"] [data-rise] {
   opacity: 0;
-  transform: translate3d(0, 14px, var(--reveal-z)) rotateX(2.5deg);
+  transform: translateY(16px);
+  transition: opacity var(--dur-reveal) var(--ease),
+              transform var(--dur-reveal) var(--ease);
 }
 
-/* The count ticks over rather than snapping. */
-html[data-motion="on"] .count-n {
-  transition: opacity var(--dur-micro) var(--ease),
-              transform var(--dur-micro) var(--ease);
-}
-
-html[data-motion="on"] .count-n.is-ticking {
-  opacity: 0;
-  transform: translateY(-5px);
+html[data-motion="on"] [data-rise].is-revealed {
+  opacity: 1;
+  transform: none;
 }
 
 /* ==========================================================================
    Touch — the second guard.
-   motion.js already declines to bind pointer tilt on a coarse pointer, so
+   motion.js already declines to bind pointer parallax on a coarse pointer, so
    nothing here should ever have anything to undo. It is here so that a
    hybrid device that reports coarse after the script has bound, or a stale
-   inline value left on an element, still cannot leave a card tilted.
+   inline value left on an element, still cannot leave anything tilted.
    Scroll parallax is untouched: it is not a pointer effect.
    ========================================================================== */
 
 @media (pointer: coarse) {
-  html[data-motion="on"] .projects > li .card,
   html[data-motion="on"] .portrait-frame,
   html[data-motion="on"] .hero-inner,
   html[data-motion="on"] .gem-plane {
-    --tx: 0deg;  --ty: 0deg;
     --prx: 0deg; --pry: 0deg;
     --hrx: 0deg; --hry: 0deg;
     --px: 0px;   --py: 0px;
   }
-
-  .card::after { display: none; }       /* the sheen has no cursor to follow */
 }
 
 /* ==========================================================================

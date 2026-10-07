@@ -14,7 +14,9 @@ Import this repo into Vercel and deploy with framework preset **Other** — ther
 | --- | --- |
 | `index.html` | The entire site, plus the inline SVG `#duotone` filter the portrait is painted through. |
 | `styles.css` | Everything visual: tokens, structure, rhythm, type, motion. One sheet, no `@import`. |
-| `motion.js` | Hero entrance, scroll reveals, pointer tilt/parallax, the project filter, and the active-section nav highlight. No dependencies. |
+| `motion.js` | Hero entrance, scroll reveals (sections and project rows), pointer parallax, and the active-section nav highlight. No dependencies. The marquees are CSS only. |
+| `assets/projects/<slug>/` | Three screenshots per featured project (`1.png`, `2.png`, `3.png`). The files there now are transparent placeholders. |
+| `assets/icons/` | Stack icons, one SVG per tech (Simple Icons, plus Devicon's AWS mark), each exposing `#icon` for `<use>`. |
 | `assets/portrait.jpg` | The portrait, 640×853 (2× the 320px box it is shown in). |
 | `assets/favicon.svg` | The monogram as a tab icon — what modern browsers use, and the source the other two are generated from. |
 | `favicon.ico` | 16/32/48 bitmaps of the same mark, for older browsers and the bare `/favicon.ico` request. The 16px bitmap is drawn heavier so it survives a tab strip. |
@@ -64,7 +66,35 @@ orientation, not motion, so it runs under `prefers-reduced-motion` too.
 Add `data-reveal` to any element to give it a scroll reveal. Nothing indexes or
 names them.
 
+## Marquees
+
+The project screenshots and the stack icons share one CSS-only marquee
+(`.marquee`, `.marquee--reverse`, `.marquee--shots`, `.marquee--icons` in
+`styles.css`). Each one holds its items twice; the second copy is
+`aria-hidden` with empty `alt`, and the track slides by exactly one copy.
+
+- **Speed:** `style="--marquee-duration: 46s"` on the `.marquee` element. That
+  is one full loop, so a bigger number is slower.
+- **Direction:** add or remove `marquee--reverse`.
+- **Reduced motion:** the duplicate is hidden. Screenshots become a
+  horizontally scrollable row and icons a wrapped grid.
+
+## Screenshots
+
+Each project has 3 images in `assets/projects/<slug>/`, shown cropped to 16:10.
+Project Guardian and Solare use real shots (`1.jpg`–`3.jpg`, ~1600px wide);
+(The archived `cable-orders/{1,2,3}.png` are still transparent placeholders.)
+To ship WebP instead (`brew install webp` first):
+
+```sh
+for f in assets/projects/*/[123].png; do cwebp -q 82 "$f" -o "${f%.png}.webp"; done
+sed -i '' -E 's#(assets/projects/[a-z-]+/[123])\.png#\1.webp#g' index.html
+```
+
+Then rewrite each screenshot's `alt` to say what it shows.
+
 ## Adding a project
 
-Copy any `<li>` inside `#work`, set its `data-category`, bump the numeral, and
-update `data-total` on `.projects` along with the count in the section head.
+Archived projects sit in a comment at the end of `#work`, already in the
+current format. Move one `<li data-rise>` into `.projects`, fix the numeral,
+alternate `marquee--reverse`, and fill its screenshot folder.
